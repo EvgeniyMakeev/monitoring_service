@@ -1,6 +1,7 @@
 package model;
 
-import constants.CounterOf;
 
-public record Indication(CounterOf counterOf, double value) {
+import java.time.LocalDate;
+
+public record Indication(LocalDate date, Double value) {
 }
