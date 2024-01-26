@@ -1,7 +1,9 @@
 package service;
 
+import model.User;
+
 public interface AdminService {
-    void addEvent(String login, String message);
+    void addEvent(User user, String message);
     String getAllEvents();
     String getAllEventsForUser(String login);
 

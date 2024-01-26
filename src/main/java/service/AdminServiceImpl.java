@@ -1,7 +1,5 @@
 package service;
 
-import dao.DAO;
-import dao.UserDAOImpl;
 import model.User;
 import model.UserEvent;
 
@@ -11,12 +9,11 @@ import java.util.List;
 
 public class AdminServiceImpl implements AdminService {
     private final List<UserEvent> eventList = new ArrayList<>();
-    private final DAO<User> userDAO = new UserDAOImpl();
 
     @Override
-    public void addEvent(String login, String message) {
+    public void addEvent(User user, String message) {
         LocalDate date = LocalDate.now();
-        UserEvent userEvent = new UserEvent(date, userDAO.getByLogin(login).orElseThrow(), message);
+        UserEvent userEvent = new UserEvent(date, user, message);
         eventList.add(userEvent);
     }
 

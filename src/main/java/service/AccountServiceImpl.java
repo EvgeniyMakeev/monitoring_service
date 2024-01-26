@@ -10,6 +10,7 @@ import model.User;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class AccountServiceImpl implements AccountService{
 
@@ -19,12 +20,12 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public boolean addUser(String login, String pass) {
         for (User user : userDAO.getAll()) {
-            if (!user.login().equals(login)) {
-                userDAO.add(new User(login, pass, false));
-                return true;
+            if (user.login().equals(login)) {
+                return false;
             }
         }
-        return false;
+        userDAO.add(new User(login, pass, false));
+        return true;
     }
     @Override
     public boolean findAndCheckUser(String login, String pass) {
@@ -37,8 +38,12 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
+    public User getUserByLogin(Optional<String> login) {
+        return userDAO.getByLogin(login.get()).get();
+    }
+    @Override
     public int addIndicationOfUser(String login, Integer year, Integer month, CounterOf counterOf, Double value) {
-        User user = userDAO.getByLogin(login).orElseThrow();
+        User user = userDAO.getByLogin(login).get();
         LocalDate date = LocalDate.of(year, month, 1);
         Indication indication = new Indication(date, value);
         int answer = 0;
@@ -116,7 +121,7 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public boolean isAdmin(String login) {
-        return userDAO.getByLogin(login).orElseThrow().admin();
+        return userDAO.getByLogin(login).get().admin();
     }
 
     @Override

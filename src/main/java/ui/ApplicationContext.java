@@ -62,7 +62,8 @@ public class ApplicationContext {
                         if (accountService.findAndCheckUser(login, input.getString())) {
                             console.print("Access is allowed!");
                             loginOfCurrentUser = Optional.of(login);
-                            adminService.addEvent(loginOfCurrentUser.get(), "Login.");
+                            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                    "Login.");
                             break;
                         } else {
                             console.print("Access is denied!");
@@ -72,7 +73,8 @@ public class ApplicationContext {
                         if (accountService.addUser(login, input.getString())) {
                             console.print("Account was created!");
                             loginOfCurrentUser = Optional.of(login);
-                            adminService.addEvent(loginOfCurrentUser.get(), "Account was created and login.");
+                            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                    "Account was created and login.");
                             break;
                         } else {
                             console.print("A user with this login already exists!");
@@ -113,25 +115,26 @@ public class ApplicationContext {
                         case 4 -> { //if "Show indications submission history" was selected
                                 console.print(accountService.getAllIndicationsForUser(loginOfCurrentUser.orElseThrow()));
                                 userOption = -1;
-                                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                         "Indications submission history was viewed.");
                         }
                         case 5 -> { //if "Admin options" was selected
                             if (accountService.isAdmin(loginOfCurrentUser.orElseThrow())) {
                                 showAdminMenu = true;
                                 userOption = -1;
-                                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                         "Enter in admin option.");
                             } else {
                                 console.notAdminMessage();
                                 userOption = -1;
-                                adminService.addEvent(loginOfCurrentUser.get(),
+                                adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                         "Tried to entered in admin option.");
                             }
                         }
                         case 6 -> { //if "Log out" was selected
-                                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
-                                    "Logout.");loginOfCurrentUser = Optional.empty();
+                                adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                        "Logout.");
+                                loginOfCurrentUser = Optional.empty();
                                 showAuthorizationMenu = true;
                                 showUserMenu = false;
                                 userOption = -1;
@@ -155,7 +158,8 @@ public class ApplicationContext {
 
                         showCurrentMeter = false;
                         userOption = -1;
-                        adminService.addEvent(loginOfCurrentUser.get(), "Current meter indications was viewed.");
+                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                "Current meter indications was viewed.");
                     }
 
                     //if "Submit meter of counters" was selected
@@ -186,10 +190,12 @@ public class ApplicationContext {
 
                         if (accountService.addIndicationOfUser(loginOfCurrentUser.orElseThrow(), year, month, counterOf, value) == 1) {
                             console.addSuccessful();
-                            adminService.addEvent(loginOfCurrentUser.get(), "Submitted a meter of counters.");
+                            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                    "Submitted a meter of counters.");
                         } else {
                             console.addNotSuccessful();
-                            adminService.addEvent(loginOfCurrentUser.get(), "Tried to submit a meter of counters.");
+                            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                    "Tried to submit a meter of counters.");
                         }
 
                         showEnterIndicationMenu = false;
@@ -209,7 +215,8 @@ public class ApplicationContext {
                         showIndicationForMonth = false;
                         userOption = -1;
 
-                        adminService.addEvent(loginOfCurrentUser.get(), "Indications for the selected month was viewed.");
+                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                                "Indications for the selected month was viewed.");
                     }
 
                     //if "Admin options" was selected
@@ -221,7 +228,7 @@ public class ApplicationContext {
                                 case 1 -> { //if "Show indications submission history for all users" was selected
                                         console.print(accountService.getAllIndications());
                                         userOption = -1;
-                                        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Indications submission history for all users was viewed.");
                                     }
                                 case 2 ->  //if "Show indications submission history for user" was selected
@@ -230,13 +237,13 @@ public class ApplicationContext {
                                         showLogForUser = true;
                                 case 4 -> { //if "Show log" was selected
                                         console.print(adminService.getAllEvents());
-                                        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Log was viewed.");
                                         }
                                 case 5 -> { //if "Back to User menu" was selected
                                         showAdminMenu = false;
                                         userOption = -1;
-                                        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Exit from admin options.");
                                         }
                                 case 0 ->  //if "Exit" was selected
@@ -247,11 +254,11 @@ public class ApplicationContext {
                                 String login = input.getString();
                                 if (accountService.findUser(login)) {
                                     console.print(accountService.getAllIndicationsForUser(login));
-                                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Indications submission history for user was viewed.");
                                 } else {
                                     console.notFoundUserMessage();
-                                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Tried to view a indications submission history for user.");
                                 }
                                 userOption = -1;
@@ -261,11 +268,11 @@ public class ApplicationContext {
                                 String login = input.getString();
                                 if (accountService.findUser(login)) {
                                     console.print(adminService.getAllEventsForUser(login));
-                                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Log for user was viewed.");
                                 } else {
                                     console.notFoundUserMessage();
-                                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Tried to view a log for user.");
                                 }
                                 userOption = -1;
