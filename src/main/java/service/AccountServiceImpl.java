@@ -39,11 +39,11 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public User getUserByLogin(Optional<String> login) {
-        return userDAO.getByLogin(login.get()).get();
+        return userDAO.getByLogin(login.orElseThrow()).orElseThrow();
     }
     @Override
     public int addIndicationOfUser(String login, Integer year, Integer month, CounterOf counterOf, Double value) {
-        User user = userDAO.getByLogin(login).get();
+        User user = userDAO.getByLogin(login).orElseThrow();
         LocalDate date = LocalDate.of(year, month, 1);
         Indication indication = new Indication(date, value);
         int answer = 0;
@@ -121,7 +121,7 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public boolean isAdmin(String login) {
-        return userDAO.getByLogin(login).get().admin();
+        return userDAO.getByLogin(login).orElseThrow().admin();
     }
 
     @Override

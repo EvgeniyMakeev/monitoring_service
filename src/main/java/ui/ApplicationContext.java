@@ -68,6 +68,7 @@ public class ApplicationContext {
                         } else {
                             console.print("Access is denied!");
                             console.wrongLoginMessage();
+                            console.tryOrBackMessage();
                         }
                     } else {
                         if (accountService.addUser(login, input.getString())) {
@@ -80,6 +81,7 @@ public class ApplicationContext {
                             console.print("A user with this login already exists!");
                         }
                     }
+                    console.tryOrBackMessage();
                     if (input.getInt(2) == 2) {
                         goBack = true;
                         break;
@@ -140,7 +142,7 @@ public class ApplicationContext {
                                 userOption = -1;
                                 }
                         case 0 ->  //if "Exit" was selected
-                                appAreWorking = false;
+                                System.exit(0);
                     }
 
                     //if "Show current meter indications" was selected
@@ -205,12 +207,20 @@ public class ApplicationContext {
                     //if "Show indications for the selected month" was selected
                     if (showIndicationForMonth) {
                         console.setYearMessage();
-                        Integer year = input.getInt(4);
-                        console.setMonthMessage();
-                        Integer month = input.getInt(2);
+                        Integer year;
+                        do {
+                            year = input.getInteger(4, 0, 9999);
+                        } while (year < 0);
 
-                        console.print(accountService
-                                .getAllIndicationsForUserForMonth(loginOfCurrentUser.orElseThrow(), year, month));
+                        console.setMonthMessage();
+                        Integer month;
+                        do {
+                            month = input.getInteger(2, 1, 12);
+                        } while (month <= 0 && month > 12);
+
+
+                        console.print(accountService.getAllIndicationsForUserForMonth
+                                (loginOfCurrentUser.orElseThrow(), year, month));
 
                         showIndicationForMonth = false;
                         userOption = -1;
@@ -241,13 +251,13 @@ public class ApplicationContext {
                                             "Log was viewed.");
                                         }
                                 case 5 -> { //if "Back to User menu" was selected
-                                        showAdminMenu = false;
                                         userOption = -1;
+                                        showAdminMenu = false;
                                         adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
                                             "Exit from admin options.");
                                         }
                                 case 0 ->  //if "Exit" was selected
-                                        appAreWorking = false;
+                                        System.exit(0);
                             }
                             if (showHistoryForUser) {
                                 console.loginMessage();
@@ -262,6 +272,7 @@ public class ApplicationContext {
                                             "Tried to view a indications submission history for user.");
                                 }
                                 userOption = -1;
+                                showHistoryForUser = false;
                             }
                             if (showLogForUser) {
                                 console.loginMessage();
@@ -276,6 +287,7 @@ public class ApplicationContext {
                                             "Tried to view a log for user.");
                                 }
                                 userOption = -1;
+                                showLogForUser = false;
                             }
                         }
                     }

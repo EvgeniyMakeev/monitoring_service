@@ -39,6 +39,11 @@ public class AdminServiceImpl implements AdminService {
         return result.toString();
     }
 
+    @Override
+    public List<UserEvent> getEventList() {
+        return eventList;
+    }
+
     private void format(StringBuilder result, UserEvent userEvent) {
         result.append(userEvent.date())
                 .append(" | ")
