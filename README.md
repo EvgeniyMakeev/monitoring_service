@@ -59,10 +59,8 @@ To run the application, you need to have Java installed on your machine. Follow 
     - Admin options (if user is an administrator)
     - Log out
 
----
-For log in as administrator,
-use the login: **admin** and password: **admin**
----
+*For log in as administrator
+use the login:* **admin** *and password:* **admin**
 
 - **Admin Options:**
     - Show indications submission history for all users
