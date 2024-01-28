@@ -1,11 +1,10 @@
-package com.makeev.service;
+package com.makeev.monitoring_service.service;
 
 import com.makeev.monitoring_service.constants.CounterOf;
 import com.makeev.monitoring_service.dao.DAO;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationOfUser;
 import com.makeev.monitoring_service.model.User;
-import com.makeev.monitoring_service.service.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

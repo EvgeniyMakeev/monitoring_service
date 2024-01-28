@@ -1,6 +1,5 @@
-package com.makeev.in;
+package com.makeev.monitoring_service.in;
 
-import com.makeev.monitoring_service.in.InputImpl;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

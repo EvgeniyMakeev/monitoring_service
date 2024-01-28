@@ -1,7 +1,6 @@
-package com.makeev.dao;
+package com.makeev.monitoring_service.dao;
 
 import com.makeev.monitoring_service.constants.CounterOf;
-import com.makeev.monitoring_service.dao.IndicationOfUserDAOImpl;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationOfUser;
 import com.makeev.monitoring_service.model.User;

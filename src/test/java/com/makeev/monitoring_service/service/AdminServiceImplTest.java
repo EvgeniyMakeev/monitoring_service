@@ -1,8 +1,7 @@
-package com.makeev.service;
+package com.makeev.monitoring_service.service;
 
 import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.model.UserEvent;
-import com.makeev.monitoring_service.service.AdminServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,5 @@
-package com.makeev.dao;
+package com.makeev.monitoring_service.dao;
 
-import com.makeev.monitoring_service.dao.UserDAOImpl;
 import com.makeev.monitoring_service.model.User;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
