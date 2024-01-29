@@ -48,7 +48,7 @@ public class Messages {
         console.output("Please enter password:");
     }
     public void wrongLoginMessage() {
-        console.output("Wrong login or password.\n");
+        console.output("Wrong login or password.");
     }
     public void tryOrBackMessage() {
         console.output("1. Try again.\n" +

@@ -86,9 +86,6 @@ public class InputImpl implements Input {
             while (scan) {
                 str = input.nextLine();
                 if (str.length() == maxLength) {
-//                    for (int i = 0; i < maxLength; i++) {
-//                        scan = !Character.isDigit(str.charAt(i));
-//                    }
                     result = Integer.parseInt(str);
                     if (result >= min && result <= max) {
                         scan = false;
