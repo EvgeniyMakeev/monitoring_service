@@ -1,6 +1,5 @@
 package com.makeev.monitoring_service.service;
 
-import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.model.UserEvent;
 
 import java.time.LocalDate;
@@ -22,13 +21,13 @@ public class AdminServiceImpl implements AdminService {
     /**
      * Adds an event for a specific user with a corresponding message.
      *
-     * @param user    The user for whom the event is added.
+     * @param login The user of login for whom the event is added.
      * @param message The message describing the event.
      */
     @Override
-    public void addEvent(User user, String message) {
+    public void addEvent(String login, String message) {
         LocalDate date = LocalDate.now();
-        UserEvent userEvent = new UserEvent(date, user, message);
+        UserEvent userEvent = new UserEvent(date, login, message);
         eventList.add(userEvent);
     }
 
@@ -38,12 +37,8 @@ public class AdminServiceImpl implements AdminService {
      * @return A formatted string representing the submission history of all events.
      */
     @Override
-    public String getAllEvents() {
-        StringBuilder result = new StringBuilder("Log for all users:\n");
-        for (UserEvent userEvent : eventList) {
-            format(result, userEvent);
-        }
-        return result.toString();
+    public List<UserEvent> getAllEvents() {
+        return eventList;
     }
 
     /**
@@ -53,40 +48,11 @@ public class AdminServiceImpl implements AdminService {
      * @return A formatted string representing the submission history of events for the user.
      */
     @Override
-    public String getAllEventsForUser(String login) {
-        StringBuilder result = new StringBuilder("Log for " + login + ":\n");
-        List<UserEvent> eventsForUser = eventList
-                .stream()
-                .filter(e -> e.user().login().equals(login))
-                .toList();
-        for (UserEvent userEvent : eventsForUser) {
-            format(result, userEvent);
-        }
-        return result.toString();
+    public List<UserEvent> getAllEventsForUser(String login) {
+       return eventList
+               .stream()
+               .filter(e -> e.login().equals(login))
+               .toList();
     }
 
-    /**
-     * Retrieves the list of all events.
-     *
-     * @return A list containing {@link UserEvent} objects representing all events.
-     */
-    @Override
-    public List<UserEvent> getEventList() {
-        return eventList;
-    }
-
-    /**
-     * Formats a {@link UserEvent} object into a string and appends it to the result.
-     *
-     * @param result     The StringBuilder to which the formatted string is appended.
-     * @param userEvent  The UserEvent to be formatted.
-     */
-    private void format(StringBuilder result, UserEvent userEvent) {
-        result.append(userEvent.date())
-                .append(" | ")
-                .append(userEvent.user().login())
-                .append(" | ")
-                .append(userEvent.message())
-                .append("\n");
-    }
 }

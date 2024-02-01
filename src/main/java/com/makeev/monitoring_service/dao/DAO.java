@@ -18,7 +18,7 @@ public interface DAO<T> {
      * @param login The login identifier.
      * @return An optional containing the retrieved object, or empty if not found.
      */
-    Optional<T> getByLogin(String login);
+    Optional<T> getBy(String login);
 
     /**
      * Retrieves a list of all objects.

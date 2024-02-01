@@ -1,7 +1,15 @@
 package com.makeev.monitoring_service.ui;
 
+import com.makeev.monitoring_service.exceptions.EmptyException;
+import com.makeev.monitoring_service.model.Counter;
+import com.makeev.monitoring_service.model.Indication;
+import com.makeev.monitoring_service.model.User;
+import com.makeev.monitoring_service.model.UserEvent;
 import com.makeev.monitoring_service.out.Output;
 import com.makeev.monitoring_service.out.OutputImpl;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents various messages and menus displayed to the user.
@@ -33,8 +41,8 @@ public class Messages {
     }
     public void userMenu() {
         console.output("=========== USER MENU ===========\n" +
-                "1. Show current meter indications.\n" +
-                "2. Submit meter of counters.\n" +
+                "1. Submit meter of counters.\n" +
+                "2. Show current meter indications.\n" +
                 "3. Show indications for the selected month.\n" +
                 "4. Show indications submission history.\n" +
                 "5. Admin options.\n" +
@@ -46,9 +54,6 @@ public class Messages {
     }
     public void passwordMessage() {
         console.output("Please enter password:");
-    }
-    public void wrongLoginMessage() {
-        console.output("Wrong login or password.");
     }
     public void tryOrBackMessage() {
         console.output("1. Try again.\n" +
@@ -70,19 +75,29 @@ public class Messages {
         console.output("Please enter value:");
     }
     public void setCounterMessage() {
-        console.output("Counter of what?\n" +
-                "1. Heating.\n" +
-                "2. Hot watter.\n" +
-                "3. Cold watter.");
+        console.output("Counter of what?");
+    }
+    public void choiceCounterMessage() {
+        console.output("1. Select from the list.\n" +
+                "2. Add a new counter.");
+    }
+    public void setNameOfCounterMessage() {
+        console.output("Write the name of the counter: ");
+    }
+
+    public void getCounters(List<Counter> listOfCounter) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int n = 1;
+        for (Counter counter : listOfCounter) {
+            stringBuilder.append(n).append(". ").append(counter.name()).append("\n");
+            n++;
+        }
+        console.output(stringBuilder.toString());
     }
     public void addSuccessful() {
         console.output("Meter readings have been sent successfully.");
     }
-    public void addNotSuccessful() {
-        console.output("Meter readings have not been sent.\n" +
-                "Testimony can be submitted only once a month\n" +
-                "and it cannot be less than the current one.");
-    }
+
     public void adminMenu() {
         console.output("=========== ADMIN MENU ===========\n" +
                 "1. Show indications submission history for all users.\n" +
@@ -100,5 +115,77 @@ public class Messages {
     }
     public void print(String s) {
         console.output(s);
+    }
+
+    public void printIndicationOfCounter(Map<Counter,
+            List<Indication>> mapOfIndicationOfCounter, String message) {
+        StringBuilder result = new StringBuilder(message);
+        mapOfIndicationOfCounter.forEach((k,v) -> {
+            for (Indication indication : v) {
+                result.append(k.name())
+                        .append(" | ")
+                        .append(indication.date().getYear())
+                        .append(" - ")
+                        .append(indication.date().getMonth())
+                        .append(" | ")
+                        .append(indication.value())
+                        .append("\n");
+            }
+        });
+        console.output(result.toString());
+    }
+
+    public void printAllIndicationOfCounter(List<User> listOfUsers, String message) throws EmptyException {
+        if (listOfUsers.size() < 2) {
+            throw new EmptyException();
+        }
+        StringBuilder result = new StringBuilder(message);
+        for (User user : listOfUsers) {
+            if (user.mapOfIndicationOfCounter().isEmpty()) {
+                break;
+            } else {
+                result.append(user.login())
+                        .append(" | ");
+                user.mapOfIndicationOfCounter().forEach((k,v) -> {
+                    for (Indication indication : v) {
+                        result.append(k.name())
+                                .append(" | ")
+                                .append(indication.date().getYear())
+                                .append(" - ")
+                                .append(indication.date().getMonth())
+                                .append(" | ")
+                                .append(indication.value())
+                                .append("\n");
+                    }
+                });
+            }
+        }
+        console.output(result.toString());
+    }
+
+    public void printCurrentMeters(Map<Counter, Indication> mapOfCurrentIndication, String message) {
+        StringBuilder result = new StringBuilder(message);
+        mapOfCurrentIndication.forEach((k,v) -> result.append(k.name())
+                .append(" | ")
+                .append(v.date().getYear())
+                .append(" - ")
+                .append(v.date().getMonth())
+                .append(" | ")
+                .append(v.value())
+                .append("\n"));
+        console.output(result.toString());
+    }
+
+    public void printUserEvents(List<UserEvent> listOfUserEvent, String message) {
+        StringBuilder result = new StringBuilder(message);
+        for (UserEvent userEvent : listOfUserEvent) {
+            result.append(userEvent.date())
+                    .append(" | ")
+                    .append(userEvent.login())
+                    .append(" | ")
+                    .append(userEvent.message())
+                    .append("\n");
+        }
+        console.output(result.toString());
     }
 }
