@@ -1,6 +1,5 @@
 package com.makeev.monitoring_service.service;
 
-import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.model.UserEvent;
 
 import java.util.List;
@@ -11,21 +10,20 @@ import java.util.List;
  * @version 1.4
  */
 public interface AdminService {
-
     /**
      * Adds an event for a specific user with a corresponding message.
      *
-     * @param user    The user for whom the event is added.
+     * @param login The login of user for whom the event is added.
      * @param message The message describing the event.
      */
-    void addEvent(User user, String message);
+    void addEvent(String login, String message);
 
     /**
      * Retrieves the submission history of all events.
      *
      * @return A formatted string representing the submission history of all events.
      */
-    String getAllEvents();
+    List<UserEvent> getAllEvents();
 
     /**
      * Retrieves the submission history of events for a specific user.
@@ -33,12 +31,6 @@ public interface AdminService {
      * @param login The login of the user.
      * @return A formatted string representing the submission history of events for the user.
      */
-    String getAllEventsForUser(String login);
+    List<UserEvent> getAllEventsForUser(String login);
 
-    /**
-     * Retrieves the list of all events.
-     *
-     * @return A list containing {@link UserEvent} objects representing all events.
-     */
-    List<UserEvent> getEventList();
 }

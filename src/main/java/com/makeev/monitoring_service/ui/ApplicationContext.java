@@ -1,17 +1,21 @@
 package com.makeev.monitoring_service.ui;
 
-import com.makeev.monitoring_service.constants.CounterOf;
+import com.makeev.monitoring_service.exceptions.EmptyException;
+import com.makeev.monitoring_service.exceptions.IncorrectValuesException;
+import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
+import com.makeev.monitoring_service.exceptions.VerificationException;
 import com.makeev.monitoring_service.in.Input;
 import com.makeev.monitoring_service.in.InputImpl;
-import com.makeev.monitoring_service.service.AccountService;
-import com.makeev.monitoring_service.service.AccountServiceImpl;
+import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.service.AdminService;
 import com.makeev.monitoring_service.service.AdminServiceImpl;
+import com.makeev.monitoring_service.service.IndicationServiceImpl;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
- * Represents the context of the application, managing services, user authentication, and menus.
+ * Represents the context of the application, managing indicationService, user authentication, and menus.
  * @author Evgeniy Makeev
  * @version 1.4
  */
@@ -20,7 +24,7 @@ public class ApplicationContext {
     /**
      * Service for managing user accounts and indications.
      */
-    private final AccountService accountService = new AccountServiceImpl();
+    private final IndicationServiceImpl indicationService = new IndicationServiceImpl();
 
     /**
      * Service for managing admin-related events and logs.
@@ -85,218 +89,21 @@ public class ApplicationContext {
         }
         console.endMessage();
     }
-    private void userMenu() {
-        while (showUserMenu) {
-            console.greetingMessage(loginOfCurrentUser.orElseThrow());
-            console.userMenu();
-            if (userOption < 0) {
-                userOption = input.getInt(6);
-            }
-            switch (userOption) {
-                case 1 ->  //if "Show current meter indications" was selected
-                        showCurrentMeter = true;
-                case 2 -> //if "Submit meter of counters" was selected
-                        showEnterIndicationMenu = true;
-                case 3 -> //if "Show indications for the selected month" was selected
-                        showIndicationForMonth = true;
-                case 4 -> { //if "Show indications submission history" was selected
-                    console.print(accountService.getAllIndicationsForUser(loginOfCurrentUser.orElseThrow()));
-                    userOption = -1;
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                            "Indications submission history was viewed.");
-                }
-                case 5 -> { //if "Admin options" was selected
-                    if (accountService.isAdmin(loginOfCurrentUser.orElseThrow())) {
-                        showAdminMenu = true;
-                        userOption = -1;
-                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                                "Enter in admin option.");
-                    } else {
-                        console.notAdminMessage();
-                        userOption = -1;
-                        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                                "Tried to entered in admin option.");
-                    }
-                }
-                case 6 -> { //if "Log out" was selected
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                            "Logout.");
-                    loginOfCurrentUser = Optional.empty();
-                    showAuthorizationMenu = true;
-                    showUserMenu = false;
-                    userOption = -1;
-                }
-                case 0 ->  //if "Exit" was selected
-                        System.exit(0);
-            }
-            //if "Show current meter indications" was selected
-            if (showCurrentMeter) {
-                currentMeter();
-            }
-            //if "Submit meter of counters" was selected
-            if (showEnterIndicationMenu) {
-                enterIndicationMenu();
-            }
-            //if "Show indications for the selected month" was selected
-            if (showIndicationForMonth) {
-              indicationForMonth();
-            }
-            //if "Admin options" was selected
-            if (showAdminMenu) {
-                adminMenu();
-            }
-        }
-    }
 
-    private void enterIndicationMenu() {
-        console.setCounterMessage();
-        CounterOf counterOf = null;
-        userOption = input.getInt(3);
+    private void authorizationMenu() {
+        console.authorizationMenu();
+        if (userOption < 0) {
+            userOption = input.getInt(2);
+        }
+
         switch (userOption) {
-            case 1 -> counterOf = CounterOf.HEATING;
-            case 2 -> counterOf = CounterOf.HOT_WATER;
-            case 3 -> counterOf = CounterOf.COLD_WATER;
-        }
-
-        console.setYearMessage();
-        Integer year;
-        do {
-            year = input.getInteger(4, 0, 9999);
-        } while (year < 0);
-
-        console.setMonthMessage();
-        Integer month;
-        do {
-            month = input.getInteger(2, 1, 12);
-        } while (month <= 0 && month > 12);
-
-        console.setValueMessage();
-        Double value = input.getDouble();
-
-        if (accountService.addIndicationOfUser(loginOfCurrentUser.orElseThrow(), year, month, counterOf, value) == 1) {
-            console.addSuccessful();
-            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                    "Submitted a meter of counters.");
-        } else {
-            console.addNotSuccessful();
-            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                    "Tried to submit a meter of counters.");
-        }
-
-        showEnterIndicationMenu = false;
-        userOption = -1;
-    }
-
-    private void adminMenu() {
-        while (showAdminMenu) {
-            console.adminMenu();
-            userOption = input.getInt(5);
-            switch (userOption) {
-                case 1 -> { //if "Show indications submission history for all users" was selected
-                    console.print(accountService.getAllIndications());
-                    userOption = -1;
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                            "Indications submission history for all users was viewed.");
-                }
-                case 2 ->  //if "Show indications submission history for user" was selected
-                        showHistoryForUser = true;
-                case 3 -> //if "Show log for user" was selected
-                        showLogForUser = true;
-                case 4 -> { //if "Show log" was selected
-                    console.print(adminService.getAllEvents());
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                            "Log was viewed.");
-                }
-                case 5 -> { //if "Back to User menu" was selected
-                    userOption = -1;
-                    showAdminMenu = false;
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                            "Exit from admin options.");
-                }
-                case 0 ->  //if "Exit" was selected
-                        System.exit(0);
+            case 1, 2 -> { //if option "Log in" was selected
+                showAuthorizationMenu = false;
+                showLoginMenu = true;
             }
-            if (showHistoryForUser) {
-                historyForUser();
-            }
-            if (showLogForUser) {
-                logForUser();
-            }
+            //if option "Sign in" was selected
+            case 0 -> appAreWorking = false;
         }
-    }
-
-    private void indicationForMonth() {
-        console.setYearMessage();
-        Integer year;
-        do {
-            year = input.getInteger(4, 0, 9999);
-        } while (year < 0);
-
-        console.setMonthMessage();
-        Integer month;
-        do {
-            month = input.getInteger(2, 1, 12);
-        } while (month <= 0 && month > 12);
-
-
-        console.print(accountService.getAllIndicationsForUserForMonth
-                (loginOfCurrentUser.orElseThrow(), year, month));
-
-        showIndicationForMonth = false;
-        userOption = -1;
-
-        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                "Indications for the selected month was viewed.");
-    }
-
-    private void logForUser() {
-        console.loginMessage();
-        String login = input.getString();
-        if (accountService.findUser(login)) {
-            console.print(adminService.getAllEventsForUser(login));
-            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                    "Log for user was viewed.");
-        } else {
-            console.notFoundUserMessage();
-            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                    "Tried to view a log for user.");
-        }
-        userOption = -1;
-        showLogForUser = false;
-    }
-
-    private void historyForUser() {
-        console.loginMessage();
-        String login = input.getString();
-        if (accountService.findUser(login)) {
-            console.print(accountService.getAllIndicationsForUser(login));
-            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                    "Indications submission history for user was viewed.");
-        } else {
-            console.notFoundUserMessage();
-            adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                    "Tried to view a indications submission history for user.");
-        }
-        userOption = -1;
-        showHistoryForUser = false;
-    }
-
-    private void currentMeter() {
-        console.setCounterMessage();
-        CounterOf counterOf = null;
-        userOption = input.getInt(3);
-        switch (userOption) {
-            case 1 -> counterOf = CounterOf.HEATING;
-            case 2 -> counterOf = CounterOf.HOT_WATER;
-            case 3 -> counterOf = CounterOf.COLD_WATER;
-        }
-
-        console.print(accountService.getCurrentMeter(loginOfCurrentUser.orElseThrow(), counterOf));
-
-        showCurrentMeter = false;
-        userOption = -1;
-        adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
-                "Current meter indications was viewed.");
     }
 
     private void loginMenu() {
@@ -306,25 +113,27 @@ public class ApplicationContext {
             String login = input.getString();
             console.passwordMessage();
             if (userOption == 1) {
-                if (accountService.findAndCheckUser(login, input.getString())) {
+                try {
+                    indicationService.userDAO.checkCredentials(login, input.getString());
                     console.print("Access is allowed!");
                     loginOfCurrentUser = Optional.of(login);
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                             "Login.");
                     break;
-                } else {
-                    console.print("Access is denied!");
-                    console.wrongLoginMessage();
+                } catch (VerificationException e) {
+                    console.print(e.getMessage());
                 }
             } else {
-                if (accountService.addUser(login, input.getString())) {
+                try {
+                    indicationService.userDAO.existByLogin(login);
+                    indicationService.addUser(login, input.getString());
                     console.print("Account was created!");
                     loginOfCurrentUser = Optional.of(login);
-                    adminService.addEvent(accountService.getUserByLogin(loginOfCurrentUser),
+                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                             "Account was created and login.");
                     break;
-                } else {
-                    console.print("A user with this login already exists!");
+                } catch (LoginAlreadyExistsException e) {
+                    console.print(e.getMessage());
                 }
             }
             console.tryOrBackMessage();
@@ -344,19 +153,257 @@ public class ApplicationContext {
         }
     }
 
-    private void authorizationMenu() {
-        console.authorizationMenu();
-        if (userOption < 0) {
-            userOption = input.getInt(2);
+    private void userMenu() {
+        while (showUserMenu) {
+            console.greetingMessage(loginOfCurrentUser.orElseThrow());
+            console.userMenu();
+            if (userOption < 0) {
+                userOption = input.getInt(6);
+            }
+            switch (userOption) {
+                case 1 -> //if "Submit meter of counters" was selected
+                        showEnterIndicationMenu = true;
+                case 2 ->  //if "Show current meter indications" was selected
+                        showCurrentMeter = true;
+                case 3 -> //if "Show indications for the selected month" was selected
+                        showIndicationForMonth = true;
+                case 4 ->  //if "Show indications submission history" was selected
+                    showIndicationsSubmissionHistory();
+                case 5 -> //if "Admin options" was selected
+                        goToAdminOptions();
+                case 6 -> //if "Log out" was selected
+                        logOut();
+                case 0 ->  //if "Exit" was selected
+                        System.exit(0);
+            }
+            //if "Show current meter indications" was selected
+            if (showCurrentMeter) {
+                currentMeters();
+            }
+            //if "Submit meter of counters" was selected
+            if (showEnterIndicationMenu) {
+                enterIndicationMenu();
+            }
+            //if "Show indications for the selected month" was selected
+            if (showIndicationForMonth) {
+              indicationForMonth();
+            }
+            //if "Admin options" was selected
+            if (showAdminMenu) {
+                adminMenu();
+            }
         }
+    }
+
+    private void enterIndicationMenu() {
+        Counter counter = null;
+        console.setCounterMessage();
+        console.getCounters(indicationService.counterDAO.getAll());
+        console.choiceCounterMessage();
+        userOption = input.getInt(2);
 
         switch (userOption) {
-            case 1, 2 -> { //if option "Log in" was selected
-                showAuthorizationMenu = false;
-                showLoginMenu = true;
+            case 1 -> {
+                console.getCounters(indicationService.counterDAO.getAll());
+                int index = input.getInt(indicationService.counterDAO.getSizeOfList());
+                counter = indicationService.counterDAO
+                        .getByIndex(index).orElseThrow();
             }
-            //if option "Sign in" was selected
-            case 0 -> appAreWorking = false;
+            case 2 -> {
+                console.setNameOfCounterMessage();
+                counter = new Counter(input.getString());
+                indicationService.counterDAO.add(counter);
+                console.print("A new meter of counters was added.");
+                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                        "Add a new meter of counters.");
+            }
         }
+
+        LocalDate date = getDate();
+
+        console.setValueMessage();
+        Double value = input.getDouble();
+        try {
+            indicationService.userDAO.addIndicationOfUser(
+                    loginOfCurrentUser.orElseThrow(), counter, date, value);
+            console.addSuccessful();
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Submitted a meter of counters.");
+        } catch (IncorrectValuesException e) {
+            console.print(e.getMessage());
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Tried to submit a meter of counters.");
+        }
+
+        showEnterIndicationMenu = false;
+        userOption = -1;
+    }
+
+    private void currentMeters() {
+        try {
+            console.printCurrentMeters(indicationService.getCurrentIndication(loginOfCurrentUser.orElseThrow())
+                    , "Current meter indications:\n");
+        } catch (EmptyException e) {
+            console.print(e.getMessage());
+        }
+        showCurrentMeter = false;
+        userOption = -1;
+        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                "Current meter indications was viewed.");
+    }
+    private void indicationForMonth() {
+        LocalDate date = getDate();
+        try {
+            console.printIndicationOfCounter(indicationService
+                            .getAllIndicationsForUserForMonth
+                                    (loginOfCurrentUser.orElseThrow(), date),
+                    "Indications submission history for "
+                            + date.getMonth() + " - " + date.getYear() + ":\n");
+        } catch (EmptyException e) {
+            console.print(e.getMessage());
+        }
+
+        showIndicationForMonth = false;
+        userOption = -1;
+
+        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                "Indications for the selected month was viewed.");
+    }
+    private void showIndicationsSubmissionHistory() {
+        try {
+            console.printIndicationOfCounter(indicationService.userDAO.
+                            getAllIndicationsForUser(loginOfCurrentUser.orElseThrow()),
+                    "All indications for " + loginOfCurrentUser.orElseThrow() + ":\n");
+            userOption = -1;
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Indications submission history was viewed.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void goToAdminOptions() {
+        if (indicationService.userDAO.isAdmin(loginOfCurrentUser.orElseThrow())) {
+            showAdminMenu = true;
+            userOption = -1;
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Enter in admin option.");
+        } else {
+            console.notAdminMessage();
+            userOption = -1;
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Tried to entered in admin option.");
+        }
+    }
+    private void adminMenu() {
+        while (showAdminMenu) {
+            console.adminMenu();
+            userOption = input.getInt(5);
+            switch (userOption) {
+                case 1 -> //if "Show indications submission history for all users" was selected
+                    showIndicationsSubmissionHistoryForAllUsers();
+                case 2 ->  //if "Show indications submission history for user" was selected
+                        showHistoryForUser = true;
+                case 3 -> //if "Show log for user" was selected
+                        showLogForUser = true;
+                case 4 -> { //if "Show log" was selected
+                    console.printUserEvents(adminService.getAllEvents(),
+                            "Log for all users:\n");
+                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                            "Log was viewed.");
+                }
+                case 5 -> { //if "Back to User menu" was selected
+                    userOption = -1;
+                    showAdminMenu = false;
+                    adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                            "Exit from admin options.");
+                }
+                case 0 ->  //if "Exit" was selected
+                        System.exit(0);
+            }
+            if (showHistoryForUser) {
+                showIndicationsSubmissionHistoryForUser();
+            }
+            if (showLogForUser) {
+                logForUser();
+            }
+        }
+    }
+
+    private void showIndicationsSubmissionHistoryForAllUsers() {
+        try {
+            console.printAllIndicationOfCounter(indicationService.userDAO.getAll(),
+                    "Indications submission history for all users:\n");
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Indications submission history for all users was viewed.");
+        } catch (EmptyException e) {
+            console.print(e.getMessage());
+        }
+        userOption = -1;
+    }
+
+    private void showIndicationsSubmissionHistoryForUser() {
+        console.loginMessage();
+        String login = input.getString();
+        try {
+            if (indicationService.userDAO.getBy(login).isPresent()) {
+                console.printIndicationOfCounter(indicationService.userDAO
+                                .getAllIndicationsForUser(login),
+                        "Indications submission history for :" + login + "\n");
+                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                        "Indications submission history for user was viewed.");
+            } else {
+                console.notFoundUserMessage();
+                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                        "Tried to view a indications submission history for user.");
+            }
+        } catch (EmptyException e) {
+            console.print(e.getMessage());
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Indications submission history for user was viewed.");
+        }
+        userOption = -1;
+        showHistoryForUser = false;
+    }
+
+    private void logForUser() {
+        console.loginMessage();
+        String login = input.getString();
+        if (indicationService.userDAO.getBy(login).isPresent()) {
+            console.printUserEvents(adminService.getAllEventsForUser(login),
+                    "Log for " + login + ":\n");
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Log for user was viewed.");
+        } else {
+            console.notFoundUserMessage();
+            adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                    "Tried to view a log for user.");
+        }
+        userOption = -1;
+        showLogForUser = false;
+    }
+
+
+    private void logOut() {
+        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                "Logout.");
+        loginOfCurrentUser = Optional.empty();
+        showAuthorizationMenu = true;
+        showUserMenu = false;
+        userOption = -1;
+    }
+
+    private LocalDate getDate() {
+        console.setYearMessage();
+        Integer year;
+        do {
+            year = input.getInteger(4, 0, 9999);
+        } while (year < 0);
+
+        console.setMonthMessage();
+        Integer month;
+        do {
+            month = input.getInteger(2, 1, 12);
+        } while (month <= 0 && month > 12);
+        return LocalDate.of(year, month, 1);
     }
 }

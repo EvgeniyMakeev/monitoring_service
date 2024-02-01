@@ -7,5 +7,5 @@ import java.time.LocalDate;
  * @author Evgeniy Makeev
  * @version 1.4
  */
-public record UserEvent(LocalDate date, User user, String message) {
+public record UserEvent(LocalDate date, String login, String message) {
 }
