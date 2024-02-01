@@ -1,6 +1,16 @@
 package com.makeev.monitoring_service.exceptions;
 
-public class EmptyException extends Exception{
+/**
+ * The {@code EmptyException} class is an exception that is thrown when there are no indications found.
+ * It extends the {@code Exception} class and provides a custom error message.
+ */
+public class EmptyException extends Exception {
+
+    /**
+     * Overrides the {@code getMessage} method to provide a custom error message for the exception.
+     *
+     * @return A string representing the error message for the empty exception.
+     */
     @Override
     public String getMessage() {
         return "There are no indications.";

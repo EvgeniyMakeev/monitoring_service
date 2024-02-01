@@ -5,20 +5,17 @@ import java.util.Optional;
 
 /**
  * Interface for data access objects (DAO) providing common methods for accessing data.
- * @author Evgeniy Makeev
- * @version 1.4
- *
  * @param <T> The type of object handled by the DAO.
  */
-public interface DAO<T> {
+public interface DAO<T, K> {
 
     /**
      * Retrieves an object by login.
      *
-     * @param login The login identifier.
+     * @param k Some identifier.
      * @return An optional containing the retrieved object, or empty if not found.
      */
-    Optional<T> getBy(String login);
+    Optional<T> getBy(K k);
 
     /**
      * Retrieves a list of all objects.

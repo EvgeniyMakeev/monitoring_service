@@ -3,7 +3,7 @@ package com.makeev.monitoring_service.in;
 import java.util.Scanner;
 
 /**
- * Implementation of the {@link Input} interface for handling user input com.makeev.in a console application.
+ * Implementation of the {@link Input} interface for handling user input in a console application.
  * @author Evgeniy Makeev
  * @version 1.4
  */

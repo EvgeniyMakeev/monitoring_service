@@ -1,7 +1,7 @@
 package com.makeev.monitoring_service.in;
 
 /**
- * An interface defining methods for user input com.makeev.in a console application.
+ * An interface defining methods for user input in a console application.
  * @author Evgeniy Makeev
  * @version 1.4
  * */
