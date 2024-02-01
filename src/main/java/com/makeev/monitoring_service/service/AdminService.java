@@ -2,28 +2,40 @@ package com.makeev.monitoring_service.service;
 
 import com.makeev.monitoring_service.model.UserEvent;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service interface providing methods for managing admin-related events.
- * @author Evgeniy Makeev
- * @version 1.4
+ * Manages admin-related events.
  */
-public interface AdminService {
+public class AdminService {
+
+    /**
+     * List to store user events.
+     */
+    private final List<UserEvent> eventList = new ArrayList<>();
+
     /**
      * Adds an event for a specific user with a corresponding message.
      *
-     * @param login The login of user for whom the event is added.
+     * @param login The user of login for whom the event is added.
      * @param message The message describing the event.
      */
-    void addEvent(String login, String message);
+    public void addEvent(String login, String message) {
+        LocalDate date = LocalDate.now();
+        UserEvent userEvent = new UserEvent(date, login, message);
+        eventList.add(userEvent);
+    }
 
     /**
      * Retrieves the submission history of all events.
      *
      * @return A formatted string representing the submission history of all events.
      */
-    List<UserEvent> getAllEvents();
+    public List<UserEvent> getAllEvents() {
+        return eventList;
+    }
 
     /**
      * Retrieves the submission history of events for a specific user.
@@ -31,6 +43,11 @@ public interface AdminService {
      * @param login The login of the user.
      * @return A formatted string representing the submission history of events for the user.
      */
-    List<UserEvent> getAllEventsForUser(String login);
+    public List<UserEvent> getAllEventsForUser(String login) {
+       return eventList
+               .stream()
+               .filter(e -> e.login().equals(login))
+               .toList();
+    }
 
 }

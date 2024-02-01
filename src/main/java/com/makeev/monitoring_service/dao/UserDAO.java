@@ -12,32 +12,31 @@ import java.time.LocalDate;
 import java.util.*;
 
 /**
- * Implementation of the Data Access Object (DAO) for managing {@link User} entities.
- * Provides methods to retrieve, store, and manipulate user data.
- * @author Evgeniy Makeev
- * @version 1.4
+ * The {@code UserDAO} class is responsible for managing the persistence of User entities.
+ * It provides methods to retrieve, add, and query User information, as well as handle
+ * user-related operations such as login verification and indication submission.
  */
-public class UserDAOImpl implements DAO<User> {
+public class UserDAO implements DAO<User, String> {
 
     /**
-     * The list of {@link User} instances stored in the data store.
+     * A map storing User entities with login as the key.
      */
     private final Map<String, User> mapOfUser = new HashMap<>();
 
     /**
-     * Constructs a new instance of {@code UserDAOImpl} and initializes it with a default admin user.
+     * Default constructor that initializes the UserDAO with an admin user.
      */
-    public UserDAOImpl() {
+    public UserDAO() {
         String login = "admin";
         User admin = new User(login, "admin", new HashMap<>(), true);
         mapOfUser.put(login, admin);
     }
 
     /**
-     * Retrieves a {@link User} object by user login.
+     * Retrieves a User entity by its login.
      *
-     * @param login The login identifier of the user.
-     * @return An optional containing the retrieved {@link User}, or empty if not found.
+     * @param login The login of the User to retrieve.
+     * @return An {@code Optional} containing the User if found, or empty if not found.
      */
     @Override
     public Optional<User> getBy(String login) {
@@ -45,9 +44,9 @@ public class UserDAOImpl implements DAO<User> {
     }
 
     /**
-     * Retrieves a list of all stored {@link User} instances.
+     * Retrieves a list of all User entities.
      *
-     * @return The list of all stored {@link User} instances.
+     * @return The list of all User entities.
      */
     @Override
     public List<User> getAll() {
@@ -55,9 +54,9 @@ public class UserDAOImpl implements DAO<User> {
     }
 
     /**
-     * Adds a new {@link User} instance to the data store.
+     * Adds a User entity to the map.
      *
-     * @param user The {@link User} instance to add.
+     * @param user The User entity to add.
      */
     @Override
     public void add(User user) {
@@ -65,42 +64,51 @@ public class UserDAOImpl implements DAO<User> {
     }
 
     /**
-     * Adds a new user with the provided login and password.
+     * Checks if a login already exists in the map.
      *
-     * @param login The login of the new user.
+     * @param login The login to check for existence.
+     * @throws LoginAlreadyExistsException If the login already exists.
      */
     public void existByLogin(String login) throws LoginAlreadyExistsException {
         if (mapOfUser.containsKey(login)) {
             throw new LoginAlreadyExistsException();
         }
     }
+
     /**
-     * Finds and checks a user based on the provided login and password.
+     * Verifies the credentials of a user.
      *
-     * @param login The login of the user to be found.
-     * @param password The password of the user to be checked.
+     * @param login    The login to verify.
+     * @param password The password to verify.
+     * @throws VerificationException If the verification fails.
      */
     public void checkCredentials(String login, String password) throws VerificationException {
-        if (!mapOfUser.containsKey(login)) {
-            throw new VerificationException();
-        }
-        if (!mapOfUser.get(login).password().equals(password)) {
+        if (!mapOfUser.containsKey(login) || !mapOfUser.get(login).password().equals(password)) {
             throw new VerificationException();
         }
     }
+
     /**
-     * Checks if a user has admin privileges.
+     * Checks if a user is an admin.
      *
      * @param login The login of the user.
-     * @return {@code true} if the user has admin privileges, {@code false} otherwise.
+     * @return {@code true} if the user is an admin, {@code false} otherwise.
      */
     public boolean isAdmin(String login) {
         return mapOfUser.get(login).admin();
     }
 
-
-    public void addIndicationOfUser(String login, Counter counter,LocalDate date,
-                                    Double value) throws IncorrectValuesException {
+    /**
+     * Adds an Indication for a specific Counter and User.
+     *
+     * @param login  The login of the user.
+     * @param counter The Counter for which the indication is submitted.
+     * @param date    The date of the indication.
+     * @param value   The value of the indication.
+     * @throws IncorrectValuesException If the values are incorrect.
+     */
+    public void addIndicationOfUser(String login, Counter counter, LocalDate date, Double value)
+            throws IncorrectValuesException {
         List<Indication> listOfIndications = new ArrayList<>();
         if (!mapOfUser.get(login).mapOfIndicationOfCounter().isEmpty()) {
             if (mapOfUser.get(login).mapOfIndicationOfCounter().containsKey(counter)) {
@@ -109,20 +117,20 @@ public class UserDAOImpl implements DAO<User> {
         }
         for (Indication indication : listOfIndications) {
             if (indication.date().isAfter(date) || indication.date().equals(date)
-                        || indication.value() > value) {
+                    || indication.value() > value) {
                 throw new IncorrectValuesException();
             }
         }
         listOfIndications.add(new Indication(date, value));
-        mapOfUser.get(login).mapOfIndicationOfCounter()
-                .put(counter, listOfIndications);
+        mapOfUser.get(login).mapOfIndicationOfCounter().put(counter, listOfIndications);
     }
 
     /**
-     * Retrieves the submission history of indications for a specific user.
+     * Retrieves all indications for a user.
      *
      * @param login The login of the user.
-     * @return A formatted string representing the submission history of indications for the user.
+     * @return A map of Counters to a list of Indications for the specified user.
+     * @throws EmptyException If no indications are found for the user.
      */
     public Map<Counter, List<Indication>> getAllIndicationsForUser(String login) throws EmptyException {
         Map<Counter, List<Indication>> mapOfAllIndicationsForUser =

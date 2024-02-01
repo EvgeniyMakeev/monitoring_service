@@ -8,28 +8,25 @@ import com.makeev.monitoring_service.in.Input;
 import com.makeev.monitoring_service.in.InputImpl;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.service.AdminService;
-import com.makeev.monitoring_service.service.AdminServiceImpl;
-import com.makeev.monitoring_service.service.IndicationServiceImpl;
+import com.makeev.monitoring_service.service.IndicationService;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 /**
  * Represents the context of the application, managing indicationService, user authentication, and menus.
- * @author Evgeniy Makeev
- * @version 1.4
  */
 public class ApplicationContext {
 
     /**
      * Service for managing user accounts and indications.
      */
-    private final IndicationServiceImpl indicationService = new IndicationServiceImpl();
+    private final IndicationService indicationService = new IndicationService();
 
     /**
      * Service for managing admin-related events and logs.
      */
-    private final AdminService adminService = new AdminServiceImpl();
+    private final AdminService adminService = new AdminService();
 
     /**
      * Input interface for user interaction.
@@ -251,6 +248,10 @@ public class ApplicationContext {
         adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                 "Current meter indications was viewed.");
     }
+
+    /**
+     * Retrieves all indications for a user for a specific month.
+     */
     private void indicationForMonth() {
         LocalDate date = getDate();
         try {
@@ -269,6 +270,10 @@ public class ApplicationContext {
         adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                 "Indications for the selected month was viewed.");
     }
+
+    /**
+     * Shows indications submission history for a specific user.
+     */
     private void showIndicationsSubmissionHistory() {
         try {
             console.printIndicationOfCounter(indicationService.userDAO.
