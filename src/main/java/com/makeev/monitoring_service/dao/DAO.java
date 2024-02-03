@@ -10,6 +10,13 @@ import java.util.Optional;
 public interface DAO<T, K> {
 
     /**
+     * Adds a new object to the data store.
+     *
+     * @param t The object to add.
+     */
+    void add(T t);
+
+    /**
      * Retrieves an object by login.
      *
      * @param k Some identifier.
@@ -23,11 +30,4 @@ public interface DAO<T, K> {
      * @return The list of all objects.
      */
     List<T> getAll();
-
-    /**
-     * Adds a new object to the data store.
-     *
-     * @param t The object to add.
-     */
-    void add(T t);
 }

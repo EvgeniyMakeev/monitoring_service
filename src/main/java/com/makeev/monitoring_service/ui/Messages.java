@@ -34,20 +34,26 @@ public class Messages {
      * Displays the authorization menu to the user.
      */
     public void authorizationMenu() {
-        console.output("======= MAIN MENU =======\n" +
-                "1. Log in.\n" +
-                "2. Sign in.\n\n" +
-                "0. Exit");
+        console.output("""
+                ======= MAIN MENU =======
+                1. Log in.
+                2. Sign in.
+                
+                0. Exit
+                """);
     }
     public void userMenu() {
-        console.output("=========== USER MENU ===========\n" +
-                "1. Submit meter of counters.\n" +
-                "2. Show current meter indications.\n" +
-                "3. Show indications for the selected month.\n" +
-                "4. Show indications submission history.\n" +
-                "5. Admin options.\n" +
-                "6. Log out.\n\n" +
-                "0. Exit");
+        console.output("""
+                =========== USER MENU ===========
+                1. Submit meter of counters.
+                2. Show current meter indications.
+                3. Show indications for the selected month.
+                4. Show indications submission history.
+                5. Admin options.
+                6. Log out.
+                
+                0. Exit
+                """);
     }
     public void loginMessage() {
         console.output("Enter Login: ");
@@ -78,8 +84,10 @@ public class Messages {
         console.output("Counter of what?");
     }
     public void choiceCounterMessage() {
-        console.output("1. Select from the list.\n" +
-                "2. Add a new counter.");
+        console.output("""
+                1. Select from the list.
+                2. Add a new counter.
+                """);
     }
     public void setNameOfCounterMessage() {
         console.output("Write the name of the counter: ");
@@ -99,13 +107,16 @@ public class Messages {
     }
 
     public void adminMenu() {
-        console.output("=========== ADMIN MENU ===========\n" +
-                "1. Show indications submission history for all users.\n" +
-                "2. Show indications submission history for user.\n" +
-                "3. Show log for user.\n" +
-                "4. Show log.\n" +
-                "5. Back to User menu.\n\n" +
-                "0. Exit");
+        console.output("""
+                =========== ADMIN MENU ===========
+                1. Show indications submission history for all users.
+                2. Show indications submission history for user.
+                3. Show log for user.
+                4. Show log.
+                5. Back to User menu
+                
+                0. Exit
+                """);
     }
     public void loginMenu() {
         console.output("Enter your Login: ");

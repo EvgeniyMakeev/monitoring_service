@@ -22,12 +22,12 @@ public class IndicationService {
     /**
      * The UserDAO instance for managing user data.
      */
-    public final UserDAO userDAO = new UserDAO();
+    public final UserDAO userDAO = UserDAO.getInstance();
 
     /**
      * The CounterDAO instance for managing counter data.
      */
-    public final CounterDAO counterDAO = new CounterDAO();
+    public final CounterDAO counterDAO = CounterDAO.getInstance();
 
     /**
      * Adds a new user with the specified login and password.
@@ -36,7 +36,7 @@ public class IndicationService {
      * @param password The password of the user.
      */
     public void addUser(String login, String password) {
-        userDAO.add(new User(login, password, new HashMap<>(), false));
+        userDAO.add(new User(login, password,new HashMap<>(), false));
     }
 
     /**

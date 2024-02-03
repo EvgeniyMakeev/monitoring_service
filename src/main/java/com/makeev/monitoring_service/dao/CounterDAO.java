@@ -12,6 +12,12 @@ import java.util.Optional;
  */
 public class CounterDAO implements DAO<Counter, String> {
 
+    private final static CounterDAO INSTANCE = new CounterDAO();
+
+    public static CounterDAO getInstance() {
+        return INSTANCE;
+    }
+
     /**
      * The list of Counter entities managed by the DAO.
      */
@@ -33,6 +39,17 @@ public class CounterDAO implements DAO<Counter, String> {
     }
 
     /**
+     * Adds a Counter entity to the list.
+     *
+     * @param counter The Counter entity to add.
+     */
+    @Override
+    public void add(Counter counter) {
+        listOfCounter.add(counter);
+        sizeOfList = listOfCounter.size();
+    }
+
+    /**
      * Retrieves a Counter entity by its name.
      *
      * @param nameOfCounter The name of the Counter to retrieve.
@@ -40,6 +57,8 @@ public class CounterDAO implements DAO<Counter, String> {
      */
     @Override
     public Optional<Counter> getBy(String nameOfCounter) {
+
+
         for (Counter counter : listOfCounter) {
             if (counter.name().equals(nameOfCounter)) {
                 return Optional.of(counter);
@@ -56,17 +75,6 @@ public class CounterDAO implements DAO<Counter, String> {
     @Override
     public List<Counter> getAll() {
         return listOfCounter;
-    }
-
-    /**
-     * Adds a Counter entity to the list.
-     *
-     * @param counter The Counter entity to add.
-     */
-    @Override
-    public void add(Counter counter) {
-        listOfCounter.add(counter);
-        sizeOfList = listOfCounter.size();
     }
 
     /**

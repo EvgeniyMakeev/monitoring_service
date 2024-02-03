@@ -1,6 +1,7 @@
 package com.makeev.monitoring_service;
 
 import com.makeev.monitoring_service.ui.ApplicationContext;
+import com.makeev.monitoring_service.utils.InitDB;
 
 /**
  * The main class representing the utility meter reading application.
@@ -15,6 +16,7 @@ public class App {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
+        InitDB.initDB();
         new ApplicationContext().start();
     }
 }

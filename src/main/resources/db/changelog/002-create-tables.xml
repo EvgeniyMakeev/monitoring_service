@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd"
+        logicalFilePath="db/changelog/changelog.xml">
+
+    <changeSet id="002-create-table" author="evgeniy_makeev">
+        <createTable tableName="users" schemaName="user_db">
+            <column name="login" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="admin" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="counters" schemaName="user_db">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="indications" schemaName="user_db">
+            <column name="user_login" type="VARCHAR(255)">
+                <constraints foreignKeyName="indications_user_login_users_login"
+                             references="user_db.users(login)" referencedTableSchemaName="user_db"/>
+            </column>
+
+            <column name="counter_id" type="BIGINT">
+                <constraints foreignKeyName="indications_counter_id_counters_id"
+                             references="user_db.counters(id)" referencedTableSchemaName="user_db"/>
+            </column>
+
+            <column name="year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="month" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="value" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="user_events" schemaName="admin_db">
+            <column name="datestamp" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="user_login" type="VARCHAR(255)">
+                <constraints foreignKeyName="user_events_user_login_users_login"
+                             references="user_db.users(login)" referencedTableSchemaName="user_db"/>
+            </column>
+
+            <column name="message" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

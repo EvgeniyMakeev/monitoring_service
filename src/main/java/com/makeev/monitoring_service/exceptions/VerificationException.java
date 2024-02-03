@@ -14,8 +14,9 @@ public class VerificationException extends Exception {
      */
     @Override
     public String getMessage() {
-        return "Access is denied!\n"
-                + "Wrong login or password.";
+        return """
+                Access is denied!
+                Wrong login or password.""";
     }
 }
 

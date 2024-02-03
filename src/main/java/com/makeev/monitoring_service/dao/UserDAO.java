@@ -1,13 +1,12 @@
 package com.makeev.monitoring_service.dao;
 
-import com.makeev.monitoring_service.exceptions.EmptyException;
-import com.makeev.monitoring_service.exceptions.IncorrectValuesException;
-import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
-import com.makeev.monitoring_service.exceptions.VerificationException;
+import com.makeev.monitoring_service.exceptions.*;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.User;
+import com.makeev.monitoring_service.utils.ConnectionManager;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -18,20 +17,39 @@ import java.util.*;
  */
 public class UserDAO implements DAO<User, String> {
 
+    private final static UserDAO INSTANCE = new UserDAO();
+
+    public static UserDAO getInstance() {
+        return INSTANCE;
+    }
+
     /**
      * A map storing User entities with login as the key.
      */
     private final Map<String, User> mapOfUser = new HashMap<>();
 
-    /**
-     * Default constructor that initializes the UserDAO with an admin user.
-     */
-    public UserDAO() {
-        String login = "admin";
-        User admin = new User(login, "admin", new HashMap<>(), true);
-        mapOfUser.put(login, admin);
-    }
+    private final static String ADD_SQL =
+            "INSERT INTO user_db.users (login, password) VALUES (?,?)";
+    private final static String GET_ALL_SQL = "SELECT * FROM user_db.users";
+    private final static String GET_BY_LOGIN_SQL = GET_ALL_SQL + " WHERE login='?'";
 
+    /**
+     * Adds a User entity to the map.
+     *
+     * @param user The User entity to add.
+     */
+    @Override
+    public void add(User user) {
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(ADD_SQL)) {
+            statement.setString(1, user.login());
+            statement.setString(2, user.password());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
     /**
      * Retrieves a User entity by its login.
      *
@@ -40,7 +58,20 @@ public class UserDAO implements DAO<User, String> {
      */
     @Override
     public Optional<User> getBy(String login) {
-        return Optional.ofNullable(mapOfUser.get(login));
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(GET_BY_LOGIN_SQL)) {
+            User user = null;
+            var result = statement.executeQuery();
+            while (result.next()) {
+                user = new User(login,
+                        result.getString("password"),
+                        new HashMap<>(),
+                        result.getBoolean("admin"));
+            }
+            return Optional.ofNullable(user);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     /**
@@ -50,17 +81,22 @@ public class UserDAO implements DAO<User, String> {
      */
     @Override
     public List<User> getAll() {
-        return new ArrayList<>(mapOfUser.values());
-    }
-
-    /**
-     * Adds a User entity to the map.
-     *
-     * @param user The User entity to add.
-     */
-    @Override
-    public void add(User user) {
-        mapOfUser.put(user.login(), user);
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(GET_ALL_SQL)) {
+            List<User> listOfUsers = new ArrayList<>();
+            var result = statement.executeQuery();
+            while (result.next()) {
+                listOfUsers.add(
+                        new User(result.getString("login"),
+                                result.getString("password"),
+                                new HashMap<>(),
+                                result.getBoolean("admin"))
+                );
+            }
+            return listOfUsers;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     /**
