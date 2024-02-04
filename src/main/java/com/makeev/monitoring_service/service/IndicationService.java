@@ -2,9 +2,7 @@ package com.makeev.monitoring_service.service;
 
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dao.UserDAO;
-import com.makeev.monitoring_service.exceptions.DaoException;
-import com.makeev.monitoring_service.exceptions.EmptyException;
-import com.makeev.monitoring_service.exceptions.IncorrectValuesException;
+import com.makeev.monitoring_service.exceptions.*;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationsOfUser;
@@ -112,7 +110,6 @@ public class IndicationService {
      * @return A map of Counters to a list of Indications for the specified user.
      * @throws EmptyException If no indications are found for the user.
      */
-
     public List<IndicationsOfUser> getAllIndications() throws EmptyException {
         try (var connection = ConnectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_SQL)) {

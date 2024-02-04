@@ -1,9 +1,6 @@
 package com.makeev.monitoring_service.ui;
 
-import com.makeev.monitoring_service.exceptions.EmptyException;
-import com.makeev.monitoring_service.exceptions.IncorrectValuesException;
-import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
-import com.makeev.monitoring_service.exceptions.VerificationException;
+import com.makeev.monitoring_service.exceptions.*;
 import com.makeev.monitoring_service.in.Input;
 import com.makeev.monitoring_service.in.InputImpl;
 import com.makeev.monitoring_service.model.Counter;
@@ -194,26 +191,31 @@ public class ApplicationContext {
 
     private void enterIndicationMenu() {
         Counter counter = null;
-        console.setCounterMessage();
-        console.getCounters(indicationService.counterDAO.getAll());
-        console.choiceCounterMessage();
-        userOption = input.getInt(2);
-
-        switch (userOption) {
-            case 1 -> {
-                console.getCounters(indicationService.counterDAO.getAll());
-                int index = input.getInt(indicationService.counterDAO.getNumberOfCounters());
-                counter = indicationService.counterDAO.getBy((long) index).orElseThrow();
-            }
-            case 2 -> {
-                console.setNameOfCounterMessage();
-                counter = (new Counter(0L, input.getString()));
-                indicationService.counterDAO.add(counter);
-                console.print("A new meter of counters was added.");
-                adminService.addEvent(loginOfCurrentUser.orElseThrow(),
-                        "Add a new meter of counters.");
+        while (counter == null) {
+            console.setCounterMessage();
+            console.getCounters(indicationService.counterDAO.getAll());
+            console.choiceCounterMessage();
+            userOption = input.getInt(2);
+            switch (userOption) {
+                case 1 -> {
+                    console.getCounters(indicationService.counterDAO.getAll());
+                    int index = input.getInt(indicationService.counterDAO.getNumberOfCounters());
+                    counter = indicationService.counterDAO.getBy((long) index).orElseThrow();
+                }
+                case 2 -> {
+                    console.setNameOfCounterMessage();
+                    try {
+                        counter = indicationService.counterDAO.add(input.getString());
+                        console.print("A new meter of counters was added.");
+                        adminService.addEvent(loginOfCurrentUser.orElseThrow(),
+                                "Add a new meter of counters.");
+                    } catch (CounterAlreadyExistsException e) {
+                        console.print(e.getMessage());
+                    }
+                }
             }
         }
+
         LocalDate date = getDate();
         console.setValueMessage();
         Double value = input.getDouble();
@@ -279,7 +281,7 @@ public class ApplicationContext {
             userOption = -1;
             adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                     "Indications submission history was viewed.");
-        } catch (Exception e) {
+        } catch (EmptyException e) {
             throw new RuntimeException(e);
         }
     }

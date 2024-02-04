@@ -5,7 +5,7 @@ package com.makeev.monitoring_service.exceptions;
  * typically due to incorrect login credentials. It extends the {@code Exception} class and provides a
  * custom error message.
  */
-public class VerificationException extends Exception {
+public class VerificationException extends Throwable {
 
     /**
      * Overrides the {@code getMessage} method to provide a custom error message for the verification exception.

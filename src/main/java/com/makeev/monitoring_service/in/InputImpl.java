@@ -23,22 +23,21 @@ public class InputImpl implements Input {
      */
     @Override
     public int getInt(int max) {
-        //option that user entered
-        String optionString;
-
-        //option that will convert for the system
+        String str = "";
+        String regex = "^\\d+$";
+        Pattern pattern = Pattern.compile(regex);
         int option = -1;
-
         do {
-            optionString = input.nextLine();
-
-            if (optionString.matches("[0-" + max + "]+") && optionString.length() <= 1) {
-                option = Integer.parseInt(optionString);
-            } else {
-                System.out.println("Enter only digits 0 - " + max);
+            str = input.nextLine();
+            if (pattern.matcher(str).matches()) {
+                option = Integer.parseInt(str);
+                if (option > max | option <= 0) {
+                    System.out.println("Enter only digits 0 - " + max);
+                } else {
+                    return option;
+                }
             }
-        } while (!optionString.matches("[0-" + max + "]+") || optionString.length() > 1);
-        return option;
+        } while (true);
     }
 
     /**

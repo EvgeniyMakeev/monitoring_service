@@ -69,7 +69,7 @@ public class InputImplTest {
     }
 
     /**
-     * Test case for the {@link InputImpl#getInteger(int, int, int)} method
+     * Test case for the {@link InputImpl#getInteger(int)} method
      * with valid input, should return the expected integer.
      */
     @Test
@@ -81,7 +81,7 @@ public class InputImplTest {
         InputImpl input = new InputImpl();
 
         // Act
-        int result = input.getInteger(5, 1000, 99999);
+        int result = input.getInteger(5);
 
         // Assert
         assertThat(result).isEqualTo(12345);

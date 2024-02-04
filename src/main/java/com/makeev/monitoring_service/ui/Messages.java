@@ -90,10 +90,8 @@ public class Messages {
 
     public void getCounters(List<Counter> listOfCounter) {
         StringBuilder stringBuilder = new StringBuilder();
-        int n = 1;
         for (Counter counter : listOfCounter) {
-            stringBuilder.append(n).append(". ").append(counter.name()).append("\n");
-            n++;
+            stringBuilder.append(counter.id()).append(". ").append(counter.name()).append("\n");
         }
         console.output(stringBuilder.toString());
     }

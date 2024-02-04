@@ -1,17 +1,19 @@
 package com.makeev.monitoring_service.dao;
 
+import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManager;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 /**
  * The {@code CounterDAO} class is responsible for managing the persistence
  * of Counter entities. It provides methods to retrieve, add, and query Counters.
  */
-public class CounterDAO implements DAO<Counter, Long> {
+public class CounterDAO {
 
     private final static CounterDAO INSTANCE = new CounterDAO();
 
@@ -24,18 +26,25 @@ public class CounterDAO implements DAO<Counter, Long> {
     private final static String GET_ALL_SQL = "SELECT * FROM user_db.counters";
     private final static String GET_BY_ID_SQL = GET_ALL_SQL + " WHERE id=?";
     private final static String COUNT_SQL = "SELECT COUNT(*) FROM user_db.counters";
+    private final static String CHECK_NAME_OF_COUNTER_SQL = "SELECT name FROM user_db.counters WHERE name=?";
 
-    /**
-     * Adds a Counter entity to the list.
-     *
-     * @param counter The Counter entity to add.
-     */
-    @Override
-    public void add(Counter counter) {
+    public Counter add(String nameOfCounter) throws CounterAlreadyExistsException {
         try (var connection = ConnectionManager.open();
-             var statement = connection.prepareStatement(ADD_SQL)) {
-            statement.setString(1, counter.name());
-            statement.executeUpdate();
+             var statementCheck = connection.prepareStatement(CHECK_NAME_OF_COUNTER_SQL);
+             var statementAdd = connection.prepareStatement(ADD_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            statementCheck.setString(1, nameOfCounter);
+            var result = statementCheck.executeQuery();
+            if (result.next()) {
+                throw new CounterAlreadyExistsException();
+            }
+            statementAdd.setString(1, nameOfCounter);
+            statementAdd.executeUpdate();
+            var key = statementAdd.getGeneratedKeys();
+            Long id = -1L;
+            if (key.next()){
+                id = key.getLong("id");
+            }
+            return new Counter(id, nameOfCounter);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -47,7 +56,6 @@ public class CounterDAO implements DAO<Counter, Long> {
      * @param id The id of the Counter to retrieve.
      * @return An {@code Optional} containing the Counter if found, or empty if not found.
      */
-    @Override
     public Optional<Counter> getBy(Long id) {
         try (var connection = ConnectionManager.open();
              var statement = connection.prepareStatement(GET_BY_ID_SQL)) {
@@ -68,7 +76,6 @@ public class CounterDAO implements DAO<Counter, Long> {
      *
      * @return The list of all Counter entities.
      */
-    @Override
     public List<Counter> getAll() {
         try (var connection = ConnectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_SQL)) {
