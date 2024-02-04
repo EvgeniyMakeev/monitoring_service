@@ -1,15 +1,10 @@
 package com.makeev.monitoring_service.ui;
 
-import com.makeev.monitoring_service.exceptions.EmptyException;
-import com.makeev.monitoring_service.model.Counter;
-import com.makeev.monitoring_service.model.Indication;
-import com.makeev.monitoring_service.model.User;
-import com.makeev.monitoring_service.model.UserEvent;
+import com.makeev.monitoring_service.model.*;
 import com.makeev.monitoring_service.out.Output;
 import com.makeev.monitoring_service.out.OutputImpl;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents various messages and menus displayed to the user.
@@ -128,64 +123,50 @@ public class Messages {
         console.output(s);
     }
 
-    public void printIndicationOfCounter(Map<Counter,
-            List<Indication>> mapOfIndicationOfCounter, String message) {
+    public void printIndicationOfCounter(List<IndicationsOfUser> listOfIndicationsOfUser, String message) {
         StringBuilder result = new StringBuilder(message);
-        mapOfIndicationOfCounter.forEach((k,v) -> {
-            for (Indication indication : v) {
-                result.append(k.name())
+        for (IndicationsOfUser indicationsOfUser : listOfIndicationsOfUser) {
+                result.append(indicationsOfUser.counter().name())
                         .append(" | ")
-                        .append(indication.date().getYear())
+                        .append(indicationsOfUser.indication().date().getYear())
                         .append(" - ")
-                        .append(indication.date().getMonth())
+                        .append(indicationsOfUser.indication().date().getMonth())
                         .append(" | ")
-                        .append(indication.value())
+                        .append(indicationsOfUser.indication().value())
                         .append("\n");
             }
-        });
         console.output(result.toString());
     }
 
-    public void printAllIndicationOfCounter(List<User> listOfUsers, String message) throws EmptyException {
-        if (listOfUsers.size() < 2) {
-            throw new EmptyException();
-        }
+    public void printAllIndicationOfCounter(List<IndicationsOfUser> listOfIndicationsOfUser, String message) {
         StringBuilder result = new StringBuilder(message);
-        for (User user : listOfUsers) {
-            if (user.mapOfIndicationOfCounter().isEmpty()) {
-                break;
-            } else {
-                result.append(user.login())
-                        .append(" | ");
-                user.mapOfIndicationOfCounter().forEach((k,v) -> {
-                    for (Indication indication : v) {
-                        result.append(k.name())
-                                .append(" | ")
-                                .append(indication.date().getYear())
-                                .append(" - ")
-                                .append(indication.date().getMonth())
-                                .append(" | ")
-                                .append(indication.value())
-                                .append("\n");
-                    }
-                });
-            }
+        for (IndicationsOfUser indicationsOfUser : listOfIndicationsOfUser) {
+            result.append(indicationsOfUser.login())
+                    .append(" | ")
+                    .append(indicationsOfUser.counter().name())
+                    .append(" | ")
+                    .append(indicationsOfUser.indication().date().getYear())
+                    .append(" - ")
+                    .append(indicationsOfUser.indication().date().getMonth())
+                    .append(" | ")
+                    .append(indicationsOfUser.indication().value())
+                    .append("\n");
         }
         console.output(result.toString());
     }
 
-    public void printCurrentMeters(Map<Counter, Indication> mapOfCurrentIndication, String message) {
-        StringBuilder result = new StringBuilder(message);
-        mapOfCurrentIndication.forEach((k,v) -> result.append(k.name())
-                .append(" | ")
-                .append(v.date().getYear())
-                .append(" - ")
-                .append(v.date().getMonth())
-                .append(" | ")
-                .append(v.value())
-                .append("\n"));
-        console.output(result.toString());
-    }
+//    public void printCurrentMeters(List<IndicationsOfUser> listOfIndicationsOfUser, String message) {
+//        StringBuilder result = new StringBuilder(message);
+//        mapOfCurrentIndication.forEach((k,v) -> result.append(k.name())
+//                .append(" | ")
+//                .append(v.date().getYear())
+//                .append(" - ")
+//                .append(v.date().getMonth())
+//                .append(" | ")
+//                .append(v.value())
+//                .append("\n"));
+//        console.output(result.toString());
+//    }
 
     public void printUserEvents(List<UserEvent> listOfUserEvent, String message) {
         StringBuilder result = new StringBuilder(message);

@@ -20,17 +20,5 @@ public class InitDB {
         } catch (LiquibaseException | SQLException e) {
             System.out.println("SQL Exception in migration " + e.getMessage());
         }
-
-//        String sql5 = """
-//                INSERT INTO user_db.users (login, password, admin)
-//                    VALUES ('admin', 'admin', true);
-//                """;
-//        String sql6 = """
-//                INSERT INTO user_db.counters (name) VALUES
-//                    ('Heating'),
-//                    ('Hot Water'),
-//                    ('Cold Water');
-//                """;
-//
     }
 }

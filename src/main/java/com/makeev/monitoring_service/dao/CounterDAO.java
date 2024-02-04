@@ -1,16 +1,17 @@
 package com.makeev.monitoring_service.dao;
 
+import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.model.Counter;
+import com.makeev.monitoring_service.utils.ConnectionManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * The {@code CounterDAO} class is responsible for managing the persistence
  * of Counter entities. It provides methods to retrieve, add, and query Counters.
  */
-public class CounterDAO implements DAO<Counter, String> {
+public class CounterDAO implements DAO<Counter, Long> {
 
     private final static CounterDAO INSTANCE = new CounterDAO();
 
@@ -18,25 +19,11 @@ public class CounterDAO implements DAO<Counter, String> {
         return INSTANCE;
     }
 
-    /**
-     * The list of Counter entities managed by the DAO.
-     */
-    private final List<Counter> listOfCounter = new ArrayList<>();
-
-    /**
-     * The size of the list of Counter entities.
-     */
-    private int sizeOfList;
-
-    /**
-     * Default constructor that initializes the list of Counters with default values.
-     */
-    public CounterDAO() {
-        listOfCounter.add(new Counter("Heating"));
-        listOfCounter.add(new Counter("Hot Water"));
-        listOfCounter.add(new Counter("Cold Water"));
-        sizeOfList = listOfCounter.size();
-    }
+    private final static String ADD_SQL =
+            "INSERT INTO user_db.counters (name) VALUES (?)";
+    private final static String GET_ALL_SQL = "SELECT * FROM user_db.counters";
+    private final static String GET_BY_ID_SQL = GET_ALL_SQL + " WHERE id=?";
+    private final static String COUNT_SQL = "SELECT COUNT(*) FROM user_db.counters";
 
     /**
      * Adds a Counter entity to the list.
@@ -45,26 +32,35 @@ public class CounterDAO implements DAO<Counter, String> {
      */
     @Override
     public void add(Counter counter) {
-        listOfCounter.add(counter);
-        sizeOfList = listOfCounter.size();
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(ADD_SQL)) {
+            statement.setString(1, counter.name());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     /**
      * Retrieves a Counter entity by its name.
      *
-     * @param nameOfCounter The name of the Counter to retrieve.
+     * @param id The id of the Counter to retrieve.
      * @return An {@code Optional} containing the Counter if found, or empty if not found.
      */
     @Override
-    public Optional<Counter> getBy(String nameOfCounter) {
-
-
-        for (Counter counter : listOfCounter) {
-            if (counter.name().equals(nameOfCounter)) {
-                return Optional.of(counter);
+    public Optional<Counter> getBy(Long id) {
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(GET_BY_ID_SQL)) {
+            statement.setLong(1, id);
+            Counter counter = null;
+            var result = statement.executeQuery();
+            if (result.next()) {
+                counter = new Counter(id,result.getString("name"));
             }
+            return Optional.ofNullable(counter);
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
-        return Optional.empty();
     }
 
     /**
@@ -74,7 +70,20 @@ public class CounterDAO implements DAO<Counter, String> {
      */
     @Override
     public List<Counter> getAll() {
-        return listOfCounter;
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(GET_ALL_SQL)) {
+            List<Counter> listOfCounters = new ArrayList<>();
+            var result = statement.executeQuery();
+            while (result.next()) {
+                listOfCounters.add(
+                        new Counter(result.getLong("id"),
+                                result.getString("name"))
+                );
+            }
+            return listOfCounters;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     /**
@@ -82,21 +91,17 @@ public class CounterDAO implements DAO<Counter, String> {
      *
      * @return The size of the list.
      */
-    public int getSizeOfList() {
-        return sizeOfList;
-    }
-
-    /**
-     * Retrieves a Counter entity by its index in the list.
-     *
-     * @param index The index of the Counter to retrieve.
-     * @return An {@code Optional} containing the Counter if found, or empty if not found.
-     */
-    public Optional<Counter> getByIndex(int index) {
-        index -= 1;
-        if (index < sizeOfList) {
-            return Optional.of(listOfCounter.get(index));
+    public int getNumberOfCounters() {
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(COUNT_SQL)) {
+            int quantityOfCounters = 0;
+            var result = statement.executeQuery();
+            if (result.next()) {
+                quantityOfCounters = result.getInt(1);
+            }
+            return quantityOfCounters;
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
-        return Optional.empty();
     }
 }

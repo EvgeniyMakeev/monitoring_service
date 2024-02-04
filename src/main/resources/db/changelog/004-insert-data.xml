@@ -6,7 +6,7 @@
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd"
         logicalFilePath="db/changelog/changelog.xml">
 
-    <changeSet id="003-insert-data" author="evgeniy_makeev">
+    <changeSet id="004-insert-data" author="evgeniy_makeev">
         <insert tableName="users" schemaName="user_db">
             <column name="login" value="admin"/>
             <column name="password" value="admin"/>

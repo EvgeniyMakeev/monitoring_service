@@ -6,10 +6,10 @@
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd"
         logicalFilePath="db/changelog/changelog.xml">
 
-    <changeSet id="001-create-schemes" author="evgeniy_makeev">
-        <sql>
-            CREATE SCHEMA admin_db;
-            CREATE SCHEMA user_db;
-        </sql>
+    <changeSet id="002-create-sequences" author="evgeniy_makeev">
+        <createSequence sequenceName="counter_seq"
+                        dataType="BIGINT"
+                        startValue="1"
+                        incrementBy="1"/>
     </changeSet>
 </databaseChangeLog>

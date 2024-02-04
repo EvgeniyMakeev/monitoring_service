@@ -1,6 +1,7 @@
 package com.makeev.monitoring_service.in;
 
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of the {@link Input} interface for handling user input in a console application.
@@ -58,41 +59,29 @@ public class InputImpl implements Input {
     @Override
     public Double getDouble() {
         String str = "";
-        double result = -1;
-        boolean scan = true;
-        while (scan) {
-            str = input.nextLine();
-            result = Double.parseDouble(str);
-                if (result >= 0) {
-                    scan = false;
-                }
-            }
-        return result;
+        String regex = "^\\d+(\\.\\d+)?$";
+        Pattern pattern = Pattern.compile(regex);
+        while (!pattern.matcher(str).matches()) {
+            str = input.next();
+        }
+        return Double.parseDouble(str);
     }
 
     /**
      * Reads and returns an integer input from the user within the specified length and range.
      *
      * @param maxLength The maximum length of the input.
-     * @param min       The minimum allowed integer value.
-     * @param max       The maximum allowed integer value.
      * @return The integer input from the user.
      */
     @Override
-    public Integer getInteger(int maxLength, int min, int max) {
+    public Integer getInteger(int maxLength) {
         String str = "";
-        int result = -1;
-        boolean scan = true;
-            while (scan) {
-                str = input.nextLine();
-                if (str.length() == maxLength) {
-                    result = Integer.parseInt(str);
-                    if (result >= min && result <= max) {
-                        scan = false;
-                    }
-                }
+        String regex = "\\d{" + maxLength + "}";
+        Pattern pattern = Pattern.compile(regex);
+            while (!pattern.matcher(str).matches()) {
+                str = input.next();
             }
-        return result;
+        return Integer.parseInt(str);
     }
 
 }

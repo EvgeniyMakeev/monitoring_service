@@ -202,26 +202,23 @@ public class ApplicationContext {
         switch (userOption) {
             case 1 -> {
                 console.getCounters(indicationService.counterDAO.getAll());
-                int index = input.getInt(indicationService.counterDAO.getSizeOfList());
-                counter = indicationService.counterDAO
-                        .getByIndex(index).orElseThrow();
+                int index = input.getInt(indicationService.counterDAO.getNumberOfCounters());
+                counter = indicationService.counterDAO.getBy((long) index).orElseThrow();
             }
             case 2 -> {
                 console.setNameOfCounterMessage();
-                counter = new Counter(input.getString());
+                counter = (new Counter(0L, input.getString()));
                 indicationService.counterDAO.add(counter);
                 console.print("A new meter of counters was added.");
                 adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                         "Add a new meter of counters.");
             }
         }
-
         LocalDate date = getDate();
-
         console.setValueMessage();
         Double value = input.getDouble();
         try {
-            indicationService.userDAO.addIndicationOfUser(
+            indicationService.addIndicationOfUser(
                     loginOfCurrentUser.orElseThrow(), counter, date, value);
             console.addSuccessful();
             adminService.addEvent(loginOfCurrentUser.orElseThrow(),
@@ -238,7 +235,7 @@ public class ApplicationContext {
 
     private void currentMeters() {
         try {
-            console.printCurrentMeters(indicationService.getCurrentIndication(loginOfCurrentUser.orElseThrow())
+            console.printIndicationOfCounter(indicationService.getCurrentIndication(loginOfCurrentUser.orElseThrow())
                     , "Current meter indications:\n");
         } catch (EmptyException e) {
             console.print(e.getMessage());
@@ -276,7 +273,7 @@ public class ApplicationContext {
      */
     private void showIndicationsSubmissionHistory() {
         try {
-            console.printIndicationOfCounter(indicationService.userDAO.
+            console.printIndicationOfCounter(indicationService.
                             getAllIndicationsForUser(loginOfCurrentUser.orElseThrow()),
                     "All indications for " + loginOfCurrentUser.orElseThrow() + ":\n");
             userOption = -1;
@@ -311,8 +308,12 @@ public class ApplicationContext {
                 case 3 -> //if "Show log for user" was selected
                         showLogForUser = true;
                 case 4 -> { //if "Show log" was selected
-                    console.printUserEvents(adminService.getAllEvents(),
-                            "Log for all users:\n");
+                    try {
+                        console.printUserEvents(adminService.getAllEvents(),
+                                "Log for all users:\n");
+                    } catch (EmptyException e) {
+                        console.print(e.getMessage());
+                    }
                     adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                             "Log was viewed.");
                 }
@@ -336,7 +337,7 @@ public class ApplicationContext {
 
     private void showIndicationsSubmissionHistoryForAllUsers() {
         try {
-            console.printAllIndicationOfCounter(indicationService.userDAO.getAll(),
+            console.printAllIndicationOfCounter(indicationService.getAllIndications(),
                     "Indications submission history for all users:\n");
             adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                     "Indications submission history for all users was viewed.");
@@ -351,9 +352,9 @@ public class ApplicationContext {
         String login = input.getString();
         try {
             if (indicationService.userDAO.getBy(login).isPresent()) {
-                console.printIndicationOfCounter(indicationService.userDAO
+                console.printIndicationOfCounter(indicationService
                                 .getAllIndicationsForUser(login),
-                        "Indications submission history for :" + login + "\n");
+                        "Indications submission history for " + login + ":\n");
                 adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                         "Indications submission history for user was viewed.");
             } else {
@@ -374,8 +375,12 @@ public class ApplicationContext {
         console.loginMessage();
         String login = input.getString();
         if (indicationService.userDAO.getBy(login).isPresent()) {
-            console.printUserEvents(adminService.getAllEventsForUser(login),
-                    "Log for " + login + ":\n");
+            try {
+                console.printUserEvents(adminService.getAllEventsForUser(login),
+                        "Log for " + login + ":\n");
+            } catch (EmptyException e) {
+                console.print(e.getMessage());
+            }
             adminService.addEvent(loginOfCurrentUser.orElseThrow(),
                     "Log for user was viewed.");
         } else {
@@ -401,13 +406,13 @@ public class ApplicationContext {
         console.setYearMessage();
         Integer year;
         do {
-            year = input.getInteger(4, 0, 9999);
+            year = input.getInteger(4);
         } while (year < 0);
 
         console.setMonthMessage();
         Integer month;
         do {
-            month = input.getInteger(2, 1, 12);
+            month = input.getInteger(2);
         } while (month <= 0 && month > 12);
         return LocalDate.of(year, month, 1);
     }

@@ -1,7 +1,11 @@
 package com.makeev.monitoring_service.service;
 
+import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.EmptyException;
 import com.makeev.monitoring_service.model.UserEvent;
+import com.makeev.monitoring_service.utils.ConnectionManager;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +15,11 @@ import java.util.List;
  */
 public class AdminService {
 
-    /**
-     * List to store user events.
-     */
-    private final List<UserEvent> eventList = new ArrayList<>();
+    private final static String ADD_SQL =
+            "INSERT INTO admin_db.user_events (date, user_login, message) VALUES (?,?,?)";
+    private final static String GET_ALL_SQL = "SELECT * FROM admin_db.user_events";
+    private final static String GET_BY_LOGIN_SQL = GET_ALL_SQL + " WHERE user_login=?";
+
 
     /**
      * Adds an event for a specific user with a corresponding message.
@@ -23,9 +28,16 @@ public class AdminService {
      * @param message The message describing the event.
      */
     public void addEvent(String login, String message) {
-        LocalDate date = LocalDate.now();
-        UserEvent userEvent = new UserEvent(date, login, message);
-        eventList.add(userEvent);
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(ADD_SQL)) {
+            statement.setString(1, LocalDate.now().toString());
+            statement.setString(2, login);
+            statement.setString(3, message);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     /**
@@ -33,8 +45,25 @@ public class AdminService {
      *
      * @return A formatted string representing the submission history of all events.
      */
-    public List<UserEvent> getAllEvents() {
-        return eventList;
+    public List<UserEvent> getAllEvents() throws EmptyException {
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(GET_ALL_SQL)) {
+            var result = statement.executeQuery();
+            List<UserEvent> listOfUserEvents = new ArrayList<>();
+            while (result.next()) {
+                listOfUserEvents.add(
+                        new UserEvent(result.getString("date"),
+                                result.getString("user_login"),
+                                result.getString("message"))
+                );
+            }
+            if (listOfUserEvents.isEmpty()) {
+                throw new EmptyException();
+            }
+            return listOfUserEvents;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     /**
@@ -43,11 +72,25 @@ public class AdminService {
      * @param login The login of the user.
      * @return A formatted string representing the submission history of events for the user.
      */
-    public List<UserEvent> getAllEventsForUser(String login) {
-       return eventList
-               .stream()
-               .filter(e -> e.login().equals(login))
-               .toList();
+    public List<UserEvent> getAllEventsForUser(String login) throws EmptyException {
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(GET_BY_LOGIN_SQL)) {
+            statement.setString(1, login);
+            var result = statement.executeQuery();
+            List<UserEvent> listOfUserEvents = new ArrayList<>();
+            while (result.next()) {
+                listOfUserEvents.add(
+                        new UserEvent(result.getString("date"),
+                                result.getString("user_login"),
+                                result.getString("message"))
+                );
+            }
+            if (listOfUserEvents.isEmpty()) {
+                throw new EmptyException();
+            }
+            return listOfUserEvents;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
-
 }
