@@ -16,7 +16,7 @@ public class App {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-        InitDB.initDB();
+        new InitDB().initDB();
         new ApplicationContext().start();
     }
 }

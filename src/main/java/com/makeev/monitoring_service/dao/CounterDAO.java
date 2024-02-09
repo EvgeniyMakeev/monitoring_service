@@ -7,7 +7,9 @@ import com.makeev.monitoring_service.utils.ConnectionManager;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The {@code CounterDAO} class is responsible for managing the persistence
@@ -15,21 +17,20 @@ import java.util.*;
  */
 public class CounterDAO {
 
-    private final static CounterDAO INSTANCE = new CounterDAO();
+    private final ConnectionManager connectionManager;
 
-    public static CounterDAO getInstance() {
-        return INSTANCE;
+    public CounterDAO(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
-
     private final static String ADD_SQL =
-            "INSERT INTO user_db.counters (name) VALUES (?)";
-    private final static String GET_ALL_SQL = "SELECT * FROM user_db.counters";
+            "INSERT INTO non_public.counters (name) VALUES (?)";
+    private final static String GET_ALL_SQL = "SELECT * FROM non_public.counters";
     private final static String GET_BY_ID_SQL = GET_ALL_SQL + " WHERE id=?";
-    private final static String COUNT_SQL = "SELECT COUNT(*) FROM user_db.counters";
-    private final static String CHECK_NAME_OF_COUNTER_SQL = "SELECT name FROM user_db.counters WHERE name=?";
+    private final static String COUNT_SQL = "SELECT COUNT(*) FROM non_public.counters";
+    private final static String CHECK_NAME_OF_COUNTER_SQL = "SELECT name FROM non_public.counters WHERE name=?";
 
     public Counter add(String nameOfCounter) throws CounterAlreadyExistsException {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statementCheck = connection.prepareStatement(CHECK_NAME_OF_COUNTER_SQL);
              var statementAdd = connection.prepareStatement(ADD_SQL, Statement.RETURN_GENERATED_KEYS)) {
             statementCheck.setString(1, nameOfCounter);
@@ -57,7 +58,7 @@ public class CounterDAO {
      * @return An {@code Optional} containing the Counter if found, or empty if not found.
      */
     public Optional<Counter> getBy(Long id) {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_ID_SQL)) {
             statement.setLong(1, id);
             Counter counter = null;
@@ -77,7 +78,7 @@ public class CounterDAO {
      * @return The list of all Counter entities.
      */
     public List<Counter> getAll() {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_SQL)) {
             List<Counter> listOfCounters = new ArrayList<>();
             var result = statement.executeQuery();
@@ -99,7 +100,7 @@ public class CounterDAO {
      * @return The size of the list.
      */
     public int getNumberOfCounters() {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(COUNT_SQL)) {
             int quantityOfCounters = 0;
             var result = statement.executeQuery();

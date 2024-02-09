@@ -6,8 +6,7 @@
 
     <groupId>makeev</groupId>
     <artifactId>Monitoring-Service</artifactId>
-    <version>1.4</version>
-    <packaging>jar</packaging>
+    <version>2.4</version>
 
     <name>Monitoring Service</name>
     <url>https://github.com/EvgeniyMakeev/monitoring_service</url>
@@ -33,6 +32,8 @@
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <postgresql.version>42.7.1</postgresql.version>
         <liquibase.version>4.25.1</liquibase.version>
+        <testcontainers.version>1.19.4</testcontainers.version>
+
     </properties>
 
     <dependencies>
@@ -79,19 +80,19 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.19.4</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.19.4</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.19.4</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 

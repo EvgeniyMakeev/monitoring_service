@@ -9,8 +9,11 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import java.sql.SQLException;
 
 public class InitDB {
-    public static void initDB() {
-        try (var connection = ConnectionManager.open()) {
+
+    private final ConnectionManager connectionManager = new ConnectionManagerImpl();
+
+    public void initDB() {
+        try (var connection = connectionManager.open()) {
             var database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(connection));
             var liquibase = new Liquibase("db/changelog/changelog.xml",

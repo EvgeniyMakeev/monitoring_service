@@ -7,7 +7,7 @@
         logicalFilePath="db/changelog/changelog.xml">
 
     <changeSet id="003-create-table" author="evgeniy_makeev">
-        <createTable tableName="users" schemaName="user_db">
+        <createTable tableName="users" schemaName="non_public">
             <column name="login" type="VARCHAR(255)">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
@@ -19,7 +19,7 @@
             </column>
         </createTable>
 
-        <createTable tableName="counters" schemaName="user_db">
+        <createTable tableName="counters" schemaName="non_public">
             <column name="id" type="BIGINT" defaultValueSequenceNext="counter_seq">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -28,15 +28,15 @@
             </column>
         </createTable>
 
-        <createTable tableName="indications" schemaName="user_db">
+        <createTable tableName="indications" schemaName="non_public">
             <column name="user_login" type="VARCHAR(255)">
                 <constraints foreignKeyName="indications_user_login_users_login"
-                             references="user_db.users(login)" referencedTableSchemaName="user_db"/>
+                             references="non_public.users(login)" referencedTableSchemaName="non_public"/>
             </column>
 
             <column name="counter_id" type="BIGINT">
                 <constraints foreignKeyName="indications_counter_id_counters_id"
-                             references="user_db.counters(id)" referencedTableSchemaName="user_db"/>
+                             references="non_public.counters(id)" referencedTableSchemaName="non_public"/>
             </column>
             <column name="year" type="BIGINT">
                 <constraints nullable="false"/>
@@ -49,13 +49,13 @@
             </column>
         </createTable>
 
-        <createTable tableName="user_events" schemaName="admin_db">
+        <createTable tableName="user_events" schemaName="non_public">
             <column name="date" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="user_login" type="VARCHAR(255)">
                 <constraints foreignKeyName="user_events_user_login_users_login"
-                             references="user_db.users(login)" referencedTableSchemaName="user_db"/>
+                             references="non_public.users(login)" referencedTableSchemaName="non_public"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>

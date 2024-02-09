@@ -153,19 +153,6 @@ public class Messages {
         console.output(result.toString());
     }
 
-//    public void printCurrentMeters(List<IndicationsOfUser> listOfIndicationsOfUser, String message) {
-//        StringBuilder result = new StringBuilder(message);
-//        mapOfCurrentIndication.forEach((k,v) -> result.append(k.name())
-//                .append(" | ")
-//                .append(v.date().getYear())
-//                .append(" - ")
-//                .append(v.date().getMonth())
-//                .append(" | ")
-//                .append(v.value())
-//                .append("\n"));
-//        console.output(result.toString());
-//    }
-
     public void printUserEvents(List<UserEvent> listOfUserEvent, String message) {
         StringBuilder result = new StringBuilder(message);
         for (UserEvent userEvent : listOfUserEvent) {

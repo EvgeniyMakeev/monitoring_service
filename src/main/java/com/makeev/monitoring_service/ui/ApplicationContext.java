@@ -6,6 +6,7 @@ import com.makeev.monitoring_service.in.InputImpl;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.service.AdminService;
 import com.makeev.monitoring_service.service.IndicationService;
+import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -18,12 +19,12 @@ public class ApplicationContext {
     /**
      * Service for managing user accounts and indications.
      */
-    private final IndicationService indicationService = new IndicationService();
+    private final IndicationService indicationService = new IndicationService(new ConnectionManagerImpl());
 
     /**
      * Service for managing admin-related events and logs.
      */
-    private final AdminService adminService = new AdminService();
+    private final AdminService adminService = new AdminService(new ConnectionManagerImpl());
 
     /**
      * Input interface for user interaction.

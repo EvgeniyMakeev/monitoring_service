@@ -8,8 +8,7 @@
 
     <changeSet id="001-create-schemes" author="evgeniy_makeev">
         <sql>
-            CREATE SCHEMA admin_db;
-            CREATE SCHEMA user_db;
+            CREATE SCHEMA non_public;
         </sql>
     </changeSet>
 </databaseChangeLog>

@@ -7,19 +7,19 @@
         logicalFilePath="db/changelog/changelog.xml">
 
     <changeSet id="004-insert-data" author="evgeniy_makeev">
-        <insert tableName="users" schemaName="user_db">
+        <insert tableName="users" schemaName="non_public">
             <column name="login" value="admin"/>
             <column name="password" value="admin"/>
             <column name="admin" value="true"/>
         </insert>
 
-        <insert tableName="counters" schemaName="user_db">
+        <insert tableName="counters" schemaName="non_public">
             <column name="name" value="Heating"/>
         </insert>
-        <insert tableName="counters" schemaName="user_db">
+        <insert tableName="counters" schemaName="non_public">
             <column name="name" value="Hot Water"/>
         </insert>
-        <insert tableName="counters" schemaName="user_db">
+        <insert tableName="counters" schemaName="non_public">
             <column name="name" value="Cold Water"/>
         </insert>
     </changeSet>

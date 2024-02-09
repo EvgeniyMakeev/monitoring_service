@@ -2,12 +2,15 @@ package com.makeev.monitoring_service.service;
 
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dao.UserDAO;
-import com.makeev.monitoring_service.exceptions.*;
+import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.EmptyException;
+import com.makeev.monitoring_service.exceptions.IncorrectValuesException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationsOfUser;
 import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManager;
+import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -21,22 +24,27 @@ import java.util.List;
  */
 public class IndicationService {
 
+    private final ConnectionManager connectionManager;
+
+    public IndicationService(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
     /**
      * The UserDAO instance for managing user data.
      */
-    public final UserDAO userDAO = UserDAO.getInstance();
+    public final UserDAO userDAO = new UserDAO(new ConnectionManagerImpl());
 
     /**
      * The CounterDAO instance for managing counter data.
      */
-    public final CounterDAO counterDAO = CounterDAO.getInstance();
+    public final CounterDAO counterDAO = new CounterDAO(new ConnectionManagerImpl());
 
     private final static String ADD_INDICATION_SQL ="""
-                        INSERT INTO user_db.indications (user_login, counter_id, year, month, value)
+                        INSERT INTO non_public.indications (user_login, counter_id, year, month, value)
                         VALUES (?,?,?,?,?)
                         """;
     private final static String GET_ALL_INDICATIONS_SQL =
-            "SELECT * FROM user_db.indications";
+            "SELECT * FROM non_public.indications";
     private final static String GET_ALL_INDICATIONS_FOR_USER_SQL =
             GET_ALL_INDICATIONS_SQL + " WHERE user_login=?";
 
@@ -70,7 +78,7 @@ public class IndicationService {
      */
     public void addIndicationOfUser(String login, Counter counter, LocalDate date, Double value)
             throws IncorrectValuesException {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statementAdd = connection.prepareStatement(ADD_INDICATION_SQL)) {
             List<IndicationsOfUser> listOfIndicationsOfUser = new ArrayList<>();
             try {
@@ -86,8 +94,9 @@ public class IndicationService {
             }
             if (!listOfIndicationsOfUser.isEmpty()) {
                 for (IndicationsOfUser indicationsOfUser : listOfIndicationsOfUser) {
-                    if (indicationsOfUser.indication().date().isAfter(date)
-                            || indicationsOfUser.indication().value() > value) {
+                    if (indicationsOfUser.counter().equals(counter)
+                            && (indicationsOfUser.indication().date().isAfter(date)
+                            || indicationsOfUser.indication().value() > value)) {
                         throw new IncorrectValuesException();
                     }
                 }
@@ -111,7 +120,7 @@ public class IndicationService {
      * @throws EmptyException If no indications are found for the user.
      */
     public List<IndicationsOfUser> getAllIndications() throws EmptyException {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_SQL)) {
             var result = statement.executeQuery();
             List<IndicationsOfUser> listOfIndicationsOfUser = new ArrayList<>();
@@ -125,9 +134,7 @@ public class IndicationService {
                 Indication indication = new Indication(date, value);
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                CounterDAO.getInstance()
-                                        .getBy(user_id)
-                                        .orElseThrow(),
+                                counterDAO.getBy(user_id).orElseThrow(),
                                 indication));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -140,7 +147,7 @@ public class IndicationService {
     }
 
     public List<IndicationsOfUser> getAllIndicationsForUser(String login) throws EmptyException {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_FOR_USER_SQL)) {
             statement.setString(1, login);
             var result = statement.executeQuery();
@@ -153,9 +160,7 @@ public class IndicationService {
                 Double value = result.getDouble("value");
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                CounterDAO.getInstance()
-                                        .getBy(user_id)
-                                        .orElseThrow(),
+                                counterDAO.getBy(user_id).orElseThrow(),
                                 new Indication(date, value)));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -176,7 +181,7 @@ public class IndicationService {
      * @throws EmptyException If no indications are found.
      */
     public List<IndicationsOfUser> getAllIndicationsForUserForMonth(String login, LocalDate date) throws EmptyException {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_FOR_USER_ON_DATE_SQL)) {
             statement.setString(1, login);
             statement.setInt(2, date.getYear());
@@ -188,9 +193,7 @@ public class IndicationService {
                 Double value = result.getDouble("value");
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                CounterDAO.getInstance()
-                                        .getBy(user_id)
-                                        .orElseThrow(),
+                                counterDAO.getBy(user_id).orElseThrow(),
                                 new Indication(date, value)));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -210,10 +213,10 @@ public class IndicationService {
      * @throws EmptyException If no indications are found.
      */
     public List<IndicationsOfUser> getCurrentIndication(String login) throws EmptyException {
-        try (var connection = ConnectionManager.open();
+        try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_CURRENT_INDICATIONS_FOR_USER_SQL)) {
             List<IndicationsOfUser> indicationsOfUserList = new ArrayList<>();
-            List<Counter> listOfCounters = CounterDAO.getInstance().getAll();
+            List<Counter> listOfCounters = counterDAO.getAll();
             for (Counter counter : listOfCounters) {
                 statement.setString(1, login);
                 statement.setLong(2, counter.id());

@@ -5,7 +5,7 @@ package com.makeev.monitoring_service.exceptions;
  * or when testimony is attempted to be submitted more than once a month or with a value less than the current one.
  * It extends the {@code Exception} class and provides a custom error message.
  */
-public class IncorrectValuesException extends Throwable {
+public class IncorrectValuesException extends RuntimeException {
 
     /**
      * Overrides the {@code getMessage} method to provide a custom error message for the incorrect values exception.

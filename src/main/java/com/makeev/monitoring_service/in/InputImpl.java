@@ -15,6 +15,10 @@ public class InputImpl implements Input {
      */
     private final Scanner input = new Scanner(System.in);
 
+    private final Pattern PATTERN_ONLY_DIGITS = Pattern.compile("^\\d+$");
+    private final Pattern PATTERN_ONLY_DOUBLE = Pattern.compile("^\\d+(\\.\\d+)?$");
+
+
     /**
      * Reads and returns an integer input from the user within the specified range.
      *
@@ -24,14 +28,12 @@ public class InputImpl implements Input {
     @Override
     public int getInt(int max) {
         String str = "";
-        String regex = "^\\d+$";
-        Pattern pattern = Pattern.compile(regex);
         int option = -1;
         do {
             str = input.nextLine();
-            if (pattern.matcher(str).matches()) {
+            if (PATTERN_ONLY_DIGITS.matcher(str).matches()) {
                 option = Integer.parseInt(str);
-                if (option > max | option <= 0) {
+                if (option > max | option < 0) {
                     System.out.println("Enter only digits 0 - " + max);
                 } else {
                     return option;
@@ -58,9 +60,7 @@ public class InputImpl implements Input {
     @Override
     public Double getDouble() {
         String str = "";
-        String regex = "^\\d+(\\.\\d+)?$";
-        Pattern pattern = Pattern.compile(regex);
-        while (!pattern.matcher(str).matches()) {
+        while (!PATTERN_ONLY_DOUBLE.matcher(str).matches()) {
             str = input.next();
         }
         return Double.parseDouble(str);
