@@ -1,10 +1,10 @@
-package com.makeev.monitoring_service.servlets;
+package com.makeev.monitoring_service.servlets.users_servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.UserDAO;
-import com.makeev.monitoring_service.dto.VerificationResponseDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
-import com.makeev.monitoring_service.exceptions.VerificationException;
+import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,13 +13,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Optional;
 
-@WebServlet("/verifyUser")
-public class VerifyUserCredentialsServlet extends HttpServlet {
+@WebServlet("/users/getUser")
+public class GetUserByLoginServlet extends HttpServlet {
+
 
     private ObjectMapper objectMapper;
     private UserDAO userDAO;
 
+    @Loggable
     @Override
     public void init() throws ServletException {
         super.init();
@@ -27,27 +30,27 @@ public class VerifyUserCredentialsServlet extends HttpServlet {
         userDAO = new UserDAO(new ConnectionManagerImpl());
     }
 
+    @Loggable
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String login = req.getParameter("login");
-            String password = req.getParameter("password");
-            if (login == null || login.isEmpty() || password == null || password.isEmpty()) {
+            if (login == null || login.isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Both login and password parameters are required");
+                resp.getWriter().write("Login parameter is required");
                 return;
             }
 
-            userDAO.checkCredentials(login, password);
-
-            VerificationResponseDTO responseDTO = new VerificationResponseDTO("User credentials verified successfully");
+            Optional<User> user = userDAO.getBy(login);
+            if (user.isEmpty()) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().write("User with this login not found");
+                return;
+            }
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getOutputStream(), responseDTO);
-        } catch (VerificationException e) {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.getWriter().write("Invalid credentials");
+            objectMapper.writeValue(resp.getOutputStream(), user.get());
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());

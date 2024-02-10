@@ -1,6 +1,7 @@
-package com.makeev.monitoring_service.servlets;
+package com.makeev.monitoring_service.servlets.indications_servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dto.IndicationsOfUserDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.EmptyException;
@@ -19,12 +20,13 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@WebServlet("/indicationsForUserForMonth")
+@WebServlet("/indications/indicationsForUserForMonth")
 public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private IndicationService indicationService;
 
+    @Loggable
     @Override
     public void init() throws ServletException {
         super.init();
@@ -32,6 +34,7 @@ public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
         indicationService = new IndicationService(new ConnectionManagerImpl());
     }
 
+    @Loggable
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {

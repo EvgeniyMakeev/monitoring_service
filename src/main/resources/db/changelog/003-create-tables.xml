@@ -53,10 +53,6 @@
             <column name="date" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="user_login" type="VARCHAR(255)">
-                <constraints foreignKeyName="user_events_user_login_users_login"
-                             references="non_public.users(login)" referencedTableSchemaName="non_public"/>
-            </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

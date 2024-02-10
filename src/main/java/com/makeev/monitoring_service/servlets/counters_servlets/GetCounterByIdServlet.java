@@ -1,6 +1,8 @@
-package com.makeev.monitoring_service.servlets;
+package com.makeev.monitoring_service.servlets.counters_servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.makeev.monitoring_service.aop.annotations.Loggable;
+import com.makeev.monitoring_service.aop.annotations.LoggableEvent;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.model.Counter;
@@ -14,12 +16,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-@WebServlet("/getCounter")
+@WebServlet("/counters/getCounter")
 public class GetCounterByIdServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private CounterDAO counterDAO;
 
+    @Loggable
     @Override
     public void init() throws ServletException {
         super.init();
@@ -27,6 +30,8 @@ public class GetCounterByIdServlet extends HttpServlet {
         counterDAO = new CounterDAO(new ConnectionManagerImpl());
     }
 
+    @Loggable
+    @LoggableEvent
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {

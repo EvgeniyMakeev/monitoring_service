@@ -17,7 +17,6 @@ import java.util.Optional;
  * It provides methods to retrieve, add, and query User information, as well as handle
  * user-related operations such as login verification and indication submission.
  */
-@Loggable
 public class UserDAO implements DAO<User, String> {
 
     private final ConnectionManager connectionManager;
@@ -38,6 +37,7 @@ public class UserDAO implements DAO<User, String> {
      *
      * @param user The User entity to add.
      */
+    @Loggable
     @Override
     public void add(User user) {
         try (var connection = connectionManager.open();
@@ -56,6 +56,7 @@ public class UserDAO implements DAO<User, String> {
      * @param login The login of the User to retrieve.
      * @return An {@code Optional} containing the User if found, or empty if not found.
      */
+    @Loggable
     @Override
     public Optional<User> getBy(String login) {
         try (var connection = connectionManager.open();
@@ -79,6 +80,7 @@ public class UserDAO implements DAO<User, String> {
      *
      * @return The list of all User entities.
      */
+    @Loggable
     @Override
     public List<User> getAll() {
         try (var connection = connectionManager.open();
@@ -104,6 +106,7 @@ public class UserDAO implements DAO<User, String> {
      * @param login The login to check for existence.
      * @throws LoginAlreadyExistsException If the login already exists.
      */
+    @Loggable
     public void existByLogin(String login) throws LoginAlreadyExistsException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_LOGIN_SQL)) {
@@ -124,6 +127,7 @@ public class UserDAO implements DAO<User, String> {
      * @param password The password to verify.
      * @throws VerificationException If the verification fails.
      */
+    @Loggable
     public void checkCredentials(String login, String password) throws VerificationException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_PASSWORD_SQL)) {
@@ -146,6 +150,7 @@ public class UserDAO implements DAO<User, String> {
      * @param login The login of the user.
      * @return {@code true} if the user is an admin, {@code false} otherwise.
      */
+    @Loggable
     public boolean isAdmin(String login) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ADMIN_SQL)) {
