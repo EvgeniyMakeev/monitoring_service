@@ -12,10 +12,16 @@ public class ConnectionManagerImpl implements ConnectionManager {
     private String username;
     private String password;
 
+
     public ConnectionManagerImpl() {
         Properties properties = new Properties();
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("PostgreSQL JDBC Driver not found", e);
+        }
         try (var inputStream = ConnectionManagerImpl.class.getClassLoader()
-                .getResourceAsStream("application.properties")) {
+                .getResourceAsStream("/application.properties")) {
             properties.load(inputStream);
             this.url = properties.getProperty("db.url");
             this.username = properties.getProperty("db.username");

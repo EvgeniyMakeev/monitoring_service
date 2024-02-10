@@ -1,5 +1,6 @@
 package com.makeev.monitoring_service.service;
 
+import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.EmptyException;
 import com.makeev.monitoring_service.model.UserEvent;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * Manages admin-related events.
  */
+@Loggable
 public class AdminService {
 
     private final ConnectionManager connectionManager;

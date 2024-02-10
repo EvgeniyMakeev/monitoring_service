@@ -1,5 +1,6 @@
 package com.makeev.monitoring_service.service;
 
+import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dao.UserDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
@@ -22,6 +23,7 @@ import java.util.List;
  * It interacts with the {@link UserDAO} and {@link CounterDAO} to perform operations such as adding users,
  * retrieving indications, and handling exceptions.
  */
+@Loggable
 public class IndicationService {
 
     private final ConnectionManager connectionManager;

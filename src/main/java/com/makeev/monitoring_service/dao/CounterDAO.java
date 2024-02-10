@@ -1,5 +1,6 @@
 package com.makeev.monitoring_service.dao;
 
+import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.model.Counter;
@@ -15,6 +16,7 @@ import java.util.Optional;
  * The {@code CounterDAO} class is responsible for managing the persistence
  * of Counter entities. It provides methods to retrieve, add, and query Counters.
  */
+@Loggable
 public class CounterDAO {
 
     private final ConnectionManager connectionManager;
@@ -26,7 +28,6 @@ public class CounterDAO {
             "INSERT INTO non_public.counters (name) VALUES (?)";
     private final static String GET_ALL_SQL = "SELECT * FROM non_public.counters";
     private final static String GET_BY_ID_SQL = GET_ALL_SQL + " WHERE id=?";
-    private final static String COUNT_SQL = "SELECT COUNT(*) FROM non_public.counters";
     private final static String CHECK_NAME_OF_COUNTER_SQL = "SELECT name FROM non_public.counters WHERE name=?";
 
     public Counter add(String nameOfCounter) throws CounterAlreadyExistsException {
@@ -89,25 +90,6 @@ public class CounterDAO {
                 );
             }
             return listOfCounters;
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-    }
-
-    /**
-     * Gets the size of the list of Counter entities.
-     *
-     * @return The size of the list.
-     */
-    public int getNumberOfCounters() {
-        try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(COUNT_SQL)) {
-            int quantityOfCounters = 0;
-            var result = statement.executeQuery();
-            if (result.next()) {
-                quantityOfCounters = result.getInt(1);
-            }
-            return quantityOfCounters;
         } catch (SQLException e) {
             throw new DaoException(e);
         }

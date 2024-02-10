@@ -1,5 +1,6 @@
 package com.makeev.monitoring_service.dao;
 
+import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
@@ -16,6 +17,7 @@ import java.util.Optional;
  * It provides methods to retrieve, add, and query User information, as well as handle
  * user-related operations such as login verification and indication submission.
  */
+@Loggable
 public class UserDAO implements DAO<User, String> {
 
     private final ConnectionManager connectionManager;
