@@ -1,5 +1,5 @@
-1. [ДЗ №2](https://github.com/EvgeniyMakeev/monitoring_service/pull/3) 
-2. [ДЗ №3](https://github.com/EvgeniyMakeev/monitoring_service/pull/2)
+1. [ДЗ №3](https://github.com/EvgeniyMakeev/monitoring_service/pull/3) 
+2. [ДЗ №2](https://github.com/EvgeniyMakeev/monitoring_service/pull/2)
 
 
 # Monitoring Service Console Application
