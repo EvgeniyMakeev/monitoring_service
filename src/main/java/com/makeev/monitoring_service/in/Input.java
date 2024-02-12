@@ -1,39 +1,46 @@
 package com.makeev.monitoring_service.in;
 
+import com.makeev.monitoring_service.exceptions.MonthFormatException;
+import com.makeev.monitoring_service.exceptions.YearFormatException;
+
+import java.util.regex.Pattern;
+
 /**
- * An interface defining methods for user input in a console application.
+ * Implementation of the {@link Input} interface for handling user input in a console application.
  * @author Evgeniy Makeev
  * @version 1.4
- * */
-public interface Input {
+ */
+public class Input {
 
-    /**
-     * Reads and returns an integer input from the user within the specified range.
-     *
-     * @param max The maximum allowed integer value.
-     * @return The integer input from the user.
-     */
-    int getInt(int max);
-
-    /**
-     * Reads and returns a string input from the user.
-     *
-     * @return The string input from the user.
-     */
-    String getString();
+    private final Pattern PATTERN_ONLY_DOUBLE = Pattern.compile("^\\d+(\\.\\d+)?$");
+    private final Pattern PATTERN_ONLY_YEAR = Pattern.compile("\\d{4}");
+    private final Pattern PATTERN_ONLY_MONTH = Pattern.compile("\\d{2}");
 
     /**
      * Reads and returns a double input from the user.
      *
      * @return The double input from the user.
      */
-    Double getDouble();
+    public Double getDouble(String inputString) {
+        if (!PATTERN_ONLY_DOUBLE.matcher(inputString).matches()) {
+            throw new NumberFormatException();
+        } else {
+            return Double.parseDouble(inputString);
+        }
+    }
 
-    /**
-     * Reads and returns an integer input from the user within the specified length and range.
-     *
-     * @param maxLength The maximum length of the input.
-     * @return The integer input from the user.
-     */
-    Integer getInteger(int maxLength);
+    public int getYear(String inputString) {
+        if (!PATTERN_ONLY_YEAR.matcher(inputString).matches()) {
+            throw new YearFormatException();
+        } else {
+            return Integer.parseInt(inputString);
+        }
+    }
+    public int getMonth(String inputString) {
+        if (!PATTERN_ONLY_MONTH.matcher(inputString).matches()) {
+            throw new MonthFormatException();
+        } else {
+            return Integer.parseInt(inputString);
+        }
+    }
 }

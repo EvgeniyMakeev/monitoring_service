@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Loggable
 @WebServlet("/logs")
@@ -41,7 +40,7 @@ public class LoggerServlet extends HttpServlet {
 
             List<UserEventDTO> userEventDTOs = userEvents.stream()
                     .map(userEventMapper::toDTO)
-                    .collect(Collectors.toList());
+                    .toList();
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);

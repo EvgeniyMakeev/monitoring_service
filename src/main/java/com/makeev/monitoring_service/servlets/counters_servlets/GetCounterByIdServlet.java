@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.NoCounterIdException;
 import com.makeev.monitoring_service.mappers.CounterMapper;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
@@ -57,6 +58,9 @@ public class GetCounterByIdServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Invalid ID format");
+        } catch (NoCounterIdException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write(e.getMessage());
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());

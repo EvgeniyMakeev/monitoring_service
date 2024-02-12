@@ -5,6 +5,7 @@ import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.UserDAO;
 import com.makeev.monitoring_service.dto.UserDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.UserNotFoundException;
 import com.makeev.monitoring_service.mappers.UserMapper;
 import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
@@ -55,6 +56,9 @@ public class GetUserByLoginServlet extends HttpServlet {
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), userDTO);
+        } catch (UserNotFoundException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write(e.getMessage());
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());

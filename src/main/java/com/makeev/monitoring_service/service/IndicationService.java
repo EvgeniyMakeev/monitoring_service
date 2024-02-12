@@ -1,6 +1,7 @@
 package com.makeev.monitoring_service.service;
 
 import com.makeev.monitoring_service.aop.annotations.Loggable;
+import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dao.UserDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
@@ -22,6 +23,8 @@ import java.util.List;
  * It interacts with the {@link UserDAO} and {@link CounterDAO} to perform operations such as adding users,
  * retrieving indications, and handling exceptions.
  */
+@Loggable
+@LoggableToDB
 public class IndicationService {
 
     private final ConnectionManager connectionManager;
@@ -62,7 +65,6 @@ public class IndicationService {
      * @param value   The value of the indication.
      * @throws IncorrectValuesException If the values are incorrect.
      */
-    @Loggable
     public void addIndicationOfUser(String login, Counter counter, LocalDate date, Double value)
             throws IncorrectValuesException {
         try (var connection = connectionManager.open();
@@ -106,7 +108,6 @@ public class IndicationService {
      * @return A map of Counters to a list of Indications for the specified user.
      * @throws EmptyException If no indications are found for the user.
      */
-    @Loggable
     public List<IndicationsOfUser> getAllIndications() throws EmptyException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_SQL)) {
@@ -134,7 +135,6 @@ public class IndicationService {
         }
     }
 
-    @Loggable
     public List<IndicationsOfUser> getAllIndicationsForUser(String login) throws EmptyException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_FOR_USER_SQL)) {
@@ -169,7 +169,6 @@ public class IndicationService {
      * @return A map of counters to lists of indications for the specified user and month.
      * @throws EmptyException If no indications are found.
      */
-    @Loggable
     public List<IndicationsOfUser> getAllIndicationsForUserForMonth(String login, LocalDate date) throws EmptyException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_INDICATIONS_FOR_USER_ON_DATE_SQL)) {
@@ -202,7 +201,6 @@ public class IndicationService {
      * @return A map of counters to the current indications for the specified user.
      * @throws EmptyException If no indications are found.
      */
-    @Loggable
     public List<IndicationsOfUser> getCurrentIndication(String login) throws EmptyException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_CURRENT_INDICATIONS_FOR_USER_SQL)) {

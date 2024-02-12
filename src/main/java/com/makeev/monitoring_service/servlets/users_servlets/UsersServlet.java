@@ -5,6 +5,7 @@ import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.UserDAO;
 import com.makeev.monitoring_service.dto.UserDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.EmptyException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
 import com.makeev.monitoring_service.mappers.UserMapper;
@@ -18,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Loggable
 @WebServlet("/users")
@@ -45,11 +45,14 @@ public class UsersServlet extends HttpServlet {
 
             List<UserDTO> userDTOs = users.stream()
                     .map(userMapper::toDTO)
-                    .collect(Collectors.toList());
+                    .toList();
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), userDTOs);
+        } catch (EmptyException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write(e.getMessage());
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());

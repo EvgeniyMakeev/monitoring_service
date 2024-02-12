@@ -6,6 +6,7 @@ import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dto.CounterDTO;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.EmptyException;
 import com.makeev.monitoring_service.mappers.CounterMapper;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
@@ -17,7 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Loggable
 @WebServlet("/counters")
@@ -41,11 +41,14 @@ public class CountersServlet extends HttpServlet {
 
             List<CounterDTO> counterDTOs = counters.stream()
                     .map(counterMapper::toDTO)
-                    .collect(Collectors.toList());
+                    .toList();
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), counterDTOs);
+        } catch (EmptyException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write(e.getMessage());
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());

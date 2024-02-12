@@ -4,6 +4,8 @@ import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
+import com.makeev.monitoring_service.exceptions.NoCounterIdException;
+import com.makeev.monitoring_service.exceptions.NoCounterNameException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManager;
 
@@ -64,14 +66,29 @@ public class CounterDAO {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_ID_SQL)) {
             statement.setLong(1, id);
-            Counter counter = null;
+            Optional<Counter> counter = Optional.empty();
             var result = statement.executeQuery();
             if (result.next()) {
-                counter = new Counter(id,result.getString("name"));
+                counter = Optional.of(new Counter(id, result.getString("name")));
             }
-            return Optional.ofNullable(counter);
+            if (counter.isEmpty()) {
+                throw new NoCounterIdException();
+            } else {
+                return counter;
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
+        }
+    }
+    public Optional<Counter> getCounterByName(String name) {
+        Optional<Counter> counter = getAllCounters()
+                .stream()
+                .filter(c -> c.name().equalsIgnoreCase(name))
+                .findFirst();
+        if (counter.isEmpty()) {
+            throw new NoCounterNameException();
+        } else {
+            return counter;
         }
     }
 

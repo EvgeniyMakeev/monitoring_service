@@ -4,6 +4,7 @@ import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
+import com.makeev.monitoring_service.exceptions.UserNotFoundException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
 import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManager;
@@ -56,14 +57,18 @@ public class UserDAO{
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_LOGIN_SQL)) {
             statement.setString(1, login);
-            User user = null;
+            Optional<User> user = Optional.empty();
             var result = statement.executeQuery();
             if (result.next()) {
-                user = new User(login,
+                user = Optional.of(new User(login,
                         result.getString("password"),
-                        result.getBoolean("admin"));
+                        result.getBoolean("admin")));
             }
-            return Optional.ofNullable(user);
+            if (user.isEmpty()) {
+                throw new UserNotFoundException();
+            } else {
+                return user;
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
         }
