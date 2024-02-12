@@ -1,6 +1,7 @@
 package com.makeev.monitoring_service.dao;
 
 import com.makeev.monitoring_service.aop.annotations.Loggable;
+import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
@@ -18,6 +19,7 @@ import java.util.Optional;
  * user-related operations such as login verification and indication submission.
  */
 @Loggable
+@LoggableToDB
 public class UserDAO{
 
     private final ConnectionManager connectionManager;
@@ -33,13 +35,13 @@ public class UserDAO{
     private final static String GET_ADMIN_SQL = "SELECT admin FROM non_public.users WHERE login=?";
     private final static String GET_LOGIN_SQL = "SELECT login FROM non_public.users WHERE login=?";
 
-    public void add(String login, String password) {
+    public User addUser(String login, String password) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(ADD_SQL)) {
             statement.setString(1, login);
             statement.setString(2, password);
-
             statement.executeUpdate();
+            return new User(login, password, false);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -50,7 +52,7 @@ public class UserDAO{
      * @param login The login of the User to retrieve.
      * @return An {@code Optional} containing the User if found, or empty if not found.
      */
-    public Optional<User> getBy(String login) {
+    public Optional<User> getUserByLogin(String login) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_LOGIN_SQL)) {
             statement.setString(1, login);
@@ -72,7 +74,7 @@ public class UserDAO{
      *
      * @return The list of all User entities.
      */
-    public List<User> getAll() {
+    public List<User> getAllUsers() {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_SQL)) {
             List<User> listOfUsers = new ArrayList<>();

@@ -8,6 +8,7 @@ import com.makeev.monitoring_service.utils.ConnectionManager;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class AdminService {
         this.connectionManager = connectionManager;
     }
     private final static String ADD_SQL =
-            "INSERT INTO non_public.user_events (date, message) VALUES (?,?)";
+            "INSERT INTO non_public.user_events (date, time, message) VALUES (?,?,?)";
     private final static String GET_ALL_SQL = "SELECT * FROM non_public.user_events";
 
 
@@ -31,8 +32,8 @@ public class AdminService {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(ADD_SQL)) {
             statement.setString(1, LocalDate.now().toString());
-            statement.setString(2, message);
-
+            statement.setString(2, LocalTime.now().toString());
+            statement.setString(3, message);
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -48,6 +49,7 @@ public class AdminService {
             while (result.next()) {
                 listOfUserEvents.add(
                         new UserEvent(result.getString("date"),
+                                result.getString("time"),
                                 result.getString("message"))
                 );
             }

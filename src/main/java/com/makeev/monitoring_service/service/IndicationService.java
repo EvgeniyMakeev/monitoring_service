@@ -122,7 +122,7 @@ public class IndicationService {
                 Indication indication = new Indication(date, value);
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                counterDAO.getBy(user_id).orElseThrow(),
+                                counterDAO.getCounterById(user_id).orElseThrow(),
                                 indication));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -149,7 +149,7 @@ public class IndicationService {
                 Double value = result.getDouble("value");
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                counterDAO.getBy(user_id).orElseThrow(),
+                                counterDAO.getCounterById(user_id).orElseThrow(),
                                 new Indication(date, value)));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -183,7 +183,7 @@ public class IndicationService {
                 Double value = result.getDouble("value");
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                counterDAO.getBy(user_id).orElseThrow(),
+                                counterDAO.getCounterById(user_id).orElseThrow(),
                                 new Indication(date, value)));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -207,7 +207,7 @@ public class IndicationService {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_CURRENT_INDICATIONS_FOR_USER_SQL)) {
             List<IndicationsOfUser> indicationsOfUserList = new ArrayList<>();
-            List<Counter> listOfCounters = counterDAO.getAll();
+            List<Counter> listOfCounters = counterDAO.getAllCounters();
             for (Counter counter : listOfCounters) {
                 statement.setString(1, login);
                 statement.setLong(2, counter.id());

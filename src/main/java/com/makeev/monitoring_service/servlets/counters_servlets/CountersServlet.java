@@ -37,7 +37,7 @@ public class CountersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            List<Counter> counters = counterDAO.getAll();
+            List<Counter> counters = counterDAO.getAllCounters();
 
             List<CounterDTO> counterDTOs = counters.stream()
                     .map(counterMapper::toDTO)
@@ -62,12 +62,10 @@ public class CountersServlet extends HttpServlet {
                 resp.getWriter().write("Name of counter is required");
                 return;
             }
-            Counter counter = counterDAO.add(nameOfCounter);
-            CounterDTO counterDTO = counterMapper.toDTO(counter);
+            counterDAO.addCounter(nameOfCounter);
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_CREATED);
-            resp.getWriter().write("Account added successfully");
-            objectMapper.writeValue(resp.getOutputStream(), counterDTO);
+            resp.getWriter().write(nameOfCounter + " counter added successfully");
         } catch (CounterAlreadyExistsException e) {
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().write(e.getMessage());

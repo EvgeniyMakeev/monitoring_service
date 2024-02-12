@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.UserDAO;
 import com.makeev.monitoring_service.dto.UserDTO;
-import com.makeev.monitoring_service.dto.VerificationResponseDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
@@ -42,7 +41,7 @@ public class UsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            List<User> users = userDAO.getAll();
+            List<User> users = userDAO.getAllUsers();
 
             List<UserDTO> userDTOs = users.stream()
                     .map(userMapper::toDTO)
@@ -69,7 +68,7 @@ public class UsersServlet extends HttpServlet {
                 return;
             }
             userDAO.existByLogin(login);
-            userDAO.add(login,password);
+            userDAO.addUser(login,password);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.getWriter().write("User added successfully");
         } catch (LoginAlreadyExistsException e) {
@@ -91,14 +90,11 @@ public class UsersServlet extends HttpServlet {
                 resp.getWriter().write("Both login and password parameters are required");
                 return;
             }
-
             userDAO.checkCredentials(login, password);
-
-            VerificationResponseDTO responseDTO = new VerificationResponseDTO("User credentials verified successfully");
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getOutputStream(), responseDTO);
+            resp.getWriter().write("User credentials verified successfully");
         } catch (VerificationException e) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resp.getWriter().write(e.getMessage());

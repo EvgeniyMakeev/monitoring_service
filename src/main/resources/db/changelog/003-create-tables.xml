@@ -53,6 +53,9 @@
             <column name="date" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="time" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

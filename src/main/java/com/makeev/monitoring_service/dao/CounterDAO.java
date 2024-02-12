@@ -1,6 +1,7 @@
 package com.makeev.monitoring_service.dao;
 
 import com.makeev.monitoring_service.aop.annotations.Loggable;
+import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.model.Counter;
@@ -17,6 +18,7 @@ import java.util.Optional;
  * of Counter entities. It provides methods to retrieve, add, and query Counters.
  */
 @Loggable
+@LoggableToDB
 public class CounterDAO {
 
     private final ConnectionManager connectionManager;
@@ -30,7 +32,7 @@ public class CounterDAO {
     private final static String GET_BY_ID_SQL = GET_ALL_SQL + " WHERE id=?";
     private final static String CHECK_NAME_OF_COUNTER_SQL = "SELECT name FROM non_public.counters WHERE name=?";
 
-    public Counter add(String nameOfCounter) throws CounterAlreadyExistsException {
+    public Counter addCounter(String nameOfCounter) throws CounterAlreadyExistsException {
         try (var connection = connectionManager.open();
              var statementCheck = connection.prepareStatement(CHECK_NAME_OF_COUNTER_SQL);
              var statementAdd = connection.prepareStatement(ADD_SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -58,7 +60,7 @@ public class CounterDAO {
      * @param id The id of the Counter to retrieve.
      * @return An {@code Optional} containing the Counter if found, or empty if not found.
      */
-    public Optional<Counter> getBy(Long id) {
+    public Optional<Counter> getCounterById(Long id) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_ID_SQL)) {
             statement.setLong(1, id);
@@ -78,7 +80,7 @@ public class CounterDAO {
      *
      * @return The list of all Counter entities.
      */
-    public List<Counter> getAll() {
+    public List<Counter> getAllCounters() {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_SQL)) {
             List<Counter> listOfCounters = new ArrayList<>();
