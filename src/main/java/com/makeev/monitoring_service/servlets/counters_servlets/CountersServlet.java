@@ -2,7 +2,6 @@ package com.makeev.monitoring_service.servlets.counters_servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
-import com.makeev.monitoring_service.aop.annotations.LoggableEvent;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dto.CounterDTO;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
@@ -20,13 +19,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Loggable
 @WebServlet("/counters")
 public class CountersServlet extends HttpServlet {
     private ObjectMapper objectMapper;
     private CounterDAO counterDAO;
     private CounterMapper counterMapper;
 
-    @Loggable
     @Override
     public void init() throws ServletException {
         super.init();
@@ -35,15 +34,13 @@ public class CountersServlet extends HttpServlet {
         counterMapper = CounterMapper.INSTANCE;
     }
 
-    @Loggable
-    @LoggableEvent
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             List<Counter> counters = counterDAO.getAll();
 
             List<CounterDTO> counterDTOs = counters.stream()
-                    .map(this::convertToDTO)
+                    .map(counterMapper::toDTO)
                     .collect(Collectors.toList());
 
             resp.setContentType("application/json");
@@ -55,8 +52,6 @@ public class CountersServlet extends HttpServlet {
         }
     }
 
-    @Loggable
-    @LoggableEvent
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
@@ -80,9 +75,5 @@ public class CountersServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());
         }
-    }
-
-    private CounterDTO convertToDTO(Counter counter) {
-        return new CounterDTO(counter.name());
     }
 }

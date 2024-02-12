@@ -1,3 +1,7 @@
+1. [ДЗ №3](https://github.com/EvgeniyMakeev/monitoring_service/pull/3)
+2. [ДЗ №2](https://github.com/EvgeniyMakeev/monitoring_service/pull/2)
+
+
 # Monitoring Service Console Application
 
 This repository contains a Java console application for managing utility meter readings. Users can log in, submit meter readings, view their submission history, and more. Additionally, administrators have access to additional options, such as viewing submission history for all users and logs.

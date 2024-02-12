@@ -9,7 +9,6 @@ import com.makeev.monitoring_service.exceptions.IncorrectValuesException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationsOfUser;
-import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManager;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 
@@ -30,10 +29,6 @@ public class IndicationService {
     public IndicationService(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
-    /**
-     * The UserDAO instance for managing user data.
-     */
-    public final UserDAO userDAO = new UserDAO(new ConnectionManagerImpl());
 
     /**
      * The CounterDAO instance for managing counter data.
@@ -57,17 +52,6 @@ public class IndicationService {
               ORDER BY value DESC, month DESC
               LIMIT 1
             """;
-
-    /**
-     * Adds a new user with the specified login and password.
-     *
-     * @param login    The login of the user.
-     * @param password The password of the user.
-     */
-    @Loggable
-    public void addUser(String login, String password) {
-        userDAO.add(new User(login, password, false));
-    }
 
     /**
      * Adds an Indication for a specific Counter and User.

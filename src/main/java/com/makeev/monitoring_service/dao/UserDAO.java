@@ -17,7 +17,8 @@ import java.util.Optional;
  * It provides methods to retrieve, add, and query User information, as well as handle
  * user-related operations such as login verification and indication submission.
  */
-public class UserDAO implements DAO<User, String> {
+@Loggable
+public class UserDAO{
 
     private final ConnectionManager connectionManager;
 
@@ -32,18 +33,11 @@ public class UserDAO implements DAO<User, String> {
     private final static String GET_ADMIN_SQL = "SELECT admin FROM non_public.users WHERE login=?";
     private final static String GET_LOGIN_SQL = "SELECT login FROM non_public.users WHERE login=?";
 
-    /**
-     * Adds a User entity to the map.
-     *
-     * @param user The User entity to add.
-     */
-    @Loggable
-    @Override
-    public void add(User user) {
+    public void add(String login, String password) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(ADD_SQL)) {
-            statement.setString(1, user.login());
-            statement.setString(2, user.password());
+            statement.setString(1, login);
+            statement.setString(2, password);
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -56,8 +50,6 @@ public class UserDAO implements DAO<User, String> {
      * @param login The login of the User to retrieve.
      * @return An {@code Optional} containing the User if found, or empty if not found.
      */
-    @Loggable
-    @Override
     public Optional<User> getBy(String login) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_LOGIN_SQL)) {
@@ -80,8 +72,6 @@ public class UserDAO implements DAO<User, String> {
      *
      * @return The list of all User entities.
      */
-    @Loggable
-    @Override
     public List<User> getAll() {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ALL_SQL)) {
@@ -106,7 +96,6 @@ public class UserDAO implements DAO<User, String> {
      * @param login The login to check for existence.
      * @throws LoginAlreadyExistsException If the login already exists.
      */
-    @Loggable
     public void existByLogin(String login) throws LoginAlreadyExistsException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_LOGIN_SQL)) {
@@ -127,7 +116,6 @@ public class UserDAO implements DAO<User, String> {
      * @param password The password to verify.
      * @throws VerificationException If the verification fails.
      */
-    @Loggable
     public void checkCredentials(String login, String password) throws VerificationException {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_PASSWORD_SQL)) {
@@ -150,7 +138,6 @@ public class UserDAO implements DAO<User, String> {
      * @param login The login of the user.
      * @return {@code true} if the user is an admin, {@code false} otherwise.
      */
-    @Loggable
     public boolean isAdmin(String login) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_ADMIN_SQL)) {

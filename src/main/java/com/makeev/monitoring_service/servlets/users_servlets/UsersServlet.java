@@ -3,12 +3,13 @@ package com.makeev.monitoring_service.servlets.users_servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.UserDAO;
+import com.makeev.monitoring_service.dto.UserDTO;
 import com.makeev.monitoring_service.dto.VerificationResponseDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
+import com.makeev.monitoring_service.mappers.UserMapper;
 import com.makeev.monitoring_service.model.User;
-import com.makeev.monitoring_service.service.IndicationService;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,39 +19,44 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Loggable
 @WebServlet("/users")
 public class UsersServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private UserDAO userDAO;
-    private IndicationService indicationService;
+    private UserMapper userMapper;
 
 
-    @Loggable
+
     @Override
     public void init() throws ServletException {
         super.init();
         objectMapper = new ObjectMapper();
         userDAO = new UserDAO(new ConnectionManagerImpl());
-        indicationService = new IndicationService(new ConnectionManagerImpl());
+        userMapper = userMapper.INSTANCE;
     }
 
-    @Loggable
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             List<User> users = userDAO.getAll();
+
+            List<UserDTO> userDTOs = users.stream()
+                    .map(userMapper::toDTO)
+                    .collect(Collectors.toList());
+
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getOutputStream(), users);
+            objectMapper.writeValue(resp.getOutputStream(), userDTOs);
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write("Error occurred: " + e.getMessage());
         }
     }
 
-    @Loggable
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
@@ -63,7 +69,7 @@ public class UsersServlet extends HttpServlet {
                 return;
             }
             userDAO.existByLogin(login);
-            indicationService.addUser(login,password);
+            userDAO.add(login,password);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.getWriter().write("User added successfully");
         } catch (LoginAlreadyExistsException e) {
@@ -74,7 +80,7 @@ public class UsersServlet extends HttpServlet {
             resp.getWriter().write("Error occurred: " + e.getMessage());
         }
     }
-    @Loggable
+
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {

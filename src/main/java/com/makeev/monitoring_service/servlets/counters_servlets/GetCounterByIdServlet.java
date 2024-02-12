@@ -2,7 +2,6 @@ package com.makeev.monitoring_service.servlets.counters_servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
-import com.makeev.monitoring_service.aop.annotations.LoggableEvent;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.model.Counter;
@@ -31,7 +30,6 @@ public class GetCounterByIdServlet extends HttpServlet {
     }
 
     @Loggable
-    @LoggableEvent
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
