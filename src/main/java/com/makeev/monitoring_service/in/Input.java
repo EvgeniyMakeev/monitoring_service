@@ -36,7 +36,7 @@ public class Input {
             return Integer.parseInt(inputString);
         }
     }
-    public int getMonth(String inputString) {
+    public Integer getMonth(String inputString) {
         if (!PATTERN_ONLY_MONTH.matcher(inputString).matches()) {
             throw new MonthFormatException();
         } else {

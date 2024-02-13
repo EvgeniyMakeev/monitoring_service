@@ -46,7 +46,8 @@ public class IndicationsServlet extends HttpServlet {
         try {
             List<IndicationsOfUser> indicationsOfUsers = indicationService.getAllIndications();
 
-            List<IndicationsOfUserDTO> indicationsOfUserDTOs = indicationsOfUsers.stream()
+            List<IndicationsOfUserDTO> indicationsOfUserDTOs = indicationsOfUsers
+                    .stream()
                     .map(indicationsOfUserMapper::toDTO)
                     .toList();
 
@@ -81,7 +82,7 @@ public class IndicationsServlet extends HttpServlet {
             int year = input.getYear(yearStr);
             int month = input.getMonth(monthStr);
             Double value = input.getDouble(valueStr);
-            LocalDate date = LocalDate.of(year,month,1);
+            LocalDate date = LocalDate.of(year, month,1);
             Counter counter = counterDAO.getCounterByName(counterName).orElseThrow();
 
             indicationService.addIndicationOfUser(login, counter, date, value);

@@ -8,6 +8,7 @@ import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.EmptyException;
 import com.makeev.monitoring_service.exceptions.UserNotFoundException;
 import com.makeev.monitoring_service.mappers.IndicationsOfUserMapper;
+import com.makeev.monitoring_service.model.IndicationsOfUser;
 import com.makeev.monitoring_service.service.IndicationService;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 import jakarta.servlet.ServletException;
@@ -19,7 +20,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet("/indications/indicationsForUser")
 public class GetAllIndicationsForUserServlet extends HttpServlet {
@@ -51,15 +51,16 @@ public class GetAllIndicationsForUserServlet extends HttpServlet {
             }
             userDAO.getUserByLogin(login);
             try {
+                List<IndicationsOfUser> indicationsOfUsers = indicationService.getAllIndicationsForUser(login);
 
-                List<IndicationsOfUserDTO> indicationDTOs = indicationService.getAllIndicationsForUser(login)
+                List<IndicationsOfUserDTO> indicationsOfUserDTOs = indicationsOfUsers
                         .stream()
                         .map(indicationsOfUserMapper::toDTO)
-                        .collect(Collectors.toList());
+                        .toList();
 
                 resp.setContentType("application/json");
                 resp.setStatus(HttpServletResponse.SC_OK);
-                objectMapper.writeValue(resp.getOutputStream(), indicationDTOs);
+                objectMapper.writeValue(resp.getOutputStream(), indicationsOfUserDTOs);
             } catch (EmptyException e) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 resp.getWriter().write("No indications found for the user");

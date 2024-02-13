@@ -7,6 +7,7 @@ import com.makeev.monitoring_service.dto.IndicationsOfUserDTO;
 import com.makeev.monitoring_service.exceptions.*;
 import com.makeev.monitoring_service.in.Input;
 import com.makeev.monitoring_service.mappers.IndicationsOfUserMapper;
+import com.makeev.monitoring_service.model.IndicationsOfUser;
 import com.makeev.monitoring_service.service.IndicationService;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 import jakarta.servlet.ServletException;
@@ -19,7 +20,6 @@ import org.mapstruct.factory.Mappers;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet("/indications/indicationsForUserForMonth")
 public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
@@ -65,14 +65,16 @@ public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
                 int month = input.getMonth(monthStr);
                 LocalDate date = LocalDate.of(year, month, 1);
 
-                List<IndicationsOfUserDTO> indicationDTOs = indicationService.getAllIndicationsForUserForMonth(login, date)
+                List<IndicationsOfUser> indicationsOfUsers = indicationService.getAllIndicationsForUserForMonth(login, date);
+
+                List<IndicationsOfUserDTO> indicationsOfUserDTOs = indicationsOfUsers
                         .stream()
                         .map(indicationsOfUserMapper::toDTO)
-                        .collect(Collectors.toList());
+                        .toList();
 
                 resp.setContentType("application/json");
                 resp.setStatus(HttpServletResponse.SC_OK);
-                objectMapper.writeValue(resp.getOutputStream(), indicationDTOs);
+                objectMapper.writeValue(resp.getOutputStream(), indicationsOfUserDTOs);
             } catch (YearFormatException e) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write(e.getMessage());
