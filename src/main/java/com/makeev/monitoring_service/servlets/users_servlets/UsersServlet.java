@@ -26,16 +26,13 @@ public class UsersServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private UserDAO userDAO;
-    private UserMapper userMapper;
-
-
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Override
     public void init() throws ServletException {
         super.init();
         objectMapper = new ObjectMapper();
         userDAO = new UserDAO(new ConnectionManagerImpl());
-        userMapper = userMapper.INSTANCE;
     }
 
     @Override

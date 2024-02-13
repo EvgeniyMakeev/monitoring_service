@@ -13,6 +13,6 @@ public class YearFormatException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return "Year must be 4 digits.";
+        return "The year must have 4 digits and be between 2000 and 2100.";
     }
 }

@@ -32,15 +32,23 @@ public class Input {
     public int getYear(String inputString) {
         if (!PATTERN_ONLY_YEAR.matcher(inputString).matches()) {
             throw new YearFormatException();
+        }
+        int result = Integer.parseInt(inputString);
+        if (result < 2000 || result > 2100) {
+            throw new YearFormatException();
         } else {
-            return Integer.parseInt(inputString);
+            return result;
         }
     }
-    public Integer getMonth(String inputString) {
+    public int getMonth(String inputString) {
         if (!PATTERN_ONLY_MONTH.matcher(inputString).matches()) {
             throw new MonthFormatException();
+        }
+        int result = Integer.parseInt(inputString);
+        if (result <= 0 || result > 12) {
+            throw new MonthFormatException();
         } else {
-            return Integer.parseInt(inputString);
+            return result;
         }
     }
 }

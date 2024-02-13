@@ -15,7 +15,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mapstruct.factory.Mappers;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -26,7 +25,7 @@ public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private IndicationService indicationService;
-    private IndicationsOfUserMapper indicationsOfUserMapper;
+    private final IndicationsOfUserMapper indicationsOfUserMapper = IndicationsOfUserMapper.INSTANCE;
     private UserDAO userDAO;
     private Input input;
 
@@ -36,7 +35,6 @@ public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
         super.init();
         objectMapper = new ObjectMapper();
         indicationService = new IndicationService(new ConnectionManagerImpl());
-        indicationsOfUserMapper = Mappers.getMapper(IndicationsOfUserMapper.class);
         userDAO = new UserDAO(new ConnectionManagerImpl());
         input = new Input();
     }

@@ -18,7 +18,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("PostgreSQL JDBC Driver not found", e);
+            throw new RuntimeException("PostgresSQL JDBC Driver not found", e);
         }
         try (var inputStream = ConnectionManagerImpl.class.getClassLoader()
                 .getResourceAsStream("/application.properties")) {

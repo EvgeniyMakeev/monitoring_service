@@ -36,13 +36,12 @@ public class UserDAO{
     private final static String GET_ADMIN_SQL = "SELECT admin FROM non_public.users WHERE login=?";
     private final static String GET_LOGIN_SQL = "SELECT login FROM non_public.users WHERE login=?";
 
-    public User addUser(String login, String password) {
+    public void addUser(String login, String password) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(ADD_SQL)) {
             statement.setString(1, login);
             statement.setString(2, password);
             statement.executeUpdate();
-            return new User(login, password, false);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -70,7 +69,7 @@ public class UserDAO{
                 return user;
             }
         } catch (SQLException e) {
-            throw new DaoException(e);
+            throw new UserNotFoundException();
         }
     }
 

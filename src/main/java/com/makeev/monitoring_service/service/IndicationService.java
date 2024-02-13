@@ -11,7 +11,6 @@ import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationsOfUser;
 import com.makeev.monitoring_service.utils.ConnectionManager;
-import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -28,15 +27,12 @@ import java.util.List;
 public class IndicationService {
 
     private final ConnectionManager connectionManager;
+    private final CounterDAO counterDAO;
 
     public IndicationService(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
+        this.counterDAO = new CounterDAO(connectionManager);
     }
-
-    /**
-     * The CounterDAO instance for managing counter data.
-     */
-    public final CounterDAO counterDAO = new CounterDAO(new ConnectionManagerImpl());
 
     private final static String ADD_INDICATION_SQL ="""
                         INSERT INTO non_public.indications (user_login, counter_id, year, month, value)

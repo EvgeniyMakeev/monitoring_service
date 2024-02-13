@@ -5,7 +5,6 @@ import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.NoCounterIdException;
-import com.makeev.monitoring_service.exceptions.NoCounterNameException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManager;
 
@@ -34,7 +33,7 @@ public class CounterDAO {
     private final static String GET_BY_ID_SQL = GET_ALL_SQL + " WHERE id=?";
     private final static String CHECK_NAME_OF_COUNTER_SQL = "SELECT name FROM non_public.counters WHERE name=?";
 
-    public Counter addCounter(String nameOfCounter) throws CounterAlreadyExistsException {
+    public void addCounter(String nameOfCounter) throws CounterAlreadyExistsException {
         try (var connection = connectionManager.open();
              var statementCheck = connection.prepareStatement(CHECK_NAME_OF_COUNTER_SQL);
              var statementAdd = connection.prepareStatement(ADD_SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -50,7 +49,6 @@ public class CounterDAO {
             if (key.next()){
                 id = key.getLong("id");
             }
-            return new Counter(id, nameOfCounter);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -81,15 +79,10 @@ public class CounterDAO {
         }
     }
     public Optional<Counter> getCounterByName(String name) {
-        Optional<Counter> counter = getAllCounters()
+        return getAllCounters()
                 .stream()
                 .filter(c -> c.name().equalsIgnoreCase(name))
                 .findFirst();
-        if (counter.isEmpty()) {
-            throw new NoCounterNameException();
-        } else {
-            return counter;
-        }
     }
 
     /**

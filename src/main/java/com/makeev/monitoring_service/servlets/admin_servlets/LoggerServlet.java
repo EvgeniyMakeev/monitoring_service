@@ -1,4 +1,4 @@
-package com.makeev.monitoring_service.servlets;
+package com.makeev.monitoring_service.servlets.admin_servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
@@ -18,19 +18,18 @@ import java.io.IOException;
 import java.util.List;
 
 @Loggable
-@WebServlet("/logs")
+@WebServlet("/admin/logs")
 public class LoggerServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private AdminService adminService;
-    private UserEventMapper userEventMapper;
+    private final UserEventMapper userEventMapper = UserEventMapper.INSTANCE;
 
     @Override
     public void init() throws ServletException {
         super.init();
         objectMapper = new ObjectMapper();
         adminService = new AdminService(new ConnectionManagerImpl());
-        userEventMapper = userEventMapper.INSTANCE;
     }
 
     @Override

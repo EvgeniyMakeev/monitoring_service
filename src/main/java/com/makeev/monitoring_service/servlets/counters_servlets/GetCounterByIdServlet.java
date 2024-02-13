@@ -23,14 +23,13 @@ public class GetCounterByIdServlet extends HttpServlet {
 
     private ObjectMapper objectMapper;
     private CounterDAO counterDAO;
-    private CounterMapper counterMapper;
+    private final CounterMapper counterMapper = CounterMapper.INSTANCE;
 
     @Override
     public void init() throws ServletException {
         super.init();
         objectMapper = new ObjectMapper();
         counterDAO = new CounterDAO(new ConnectionManagerImpl());
-        counterMapper = CounterMapper.INSTANCE;
     }
 
     @Override

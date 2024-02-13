@@ -9,7 +9,6 @@ import org.aspectj.lang.annotation.Pointcut;
 public class LoggableAspect {
     @Pointcut("within(@com.makeev.monitoring_service.aop.annotations.Loggable *) && execution(* *(..))")
     public void annotatedByLoggable() {
-
     }
 
     @Around("annotatedByLoggable()")

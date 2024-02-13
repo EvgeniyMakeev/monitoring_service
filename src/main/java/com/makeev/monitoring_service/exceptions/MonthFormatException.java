@@ -13,6 +13,6 @@ public class MonthFormatException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return "Month must be 2 digits.";
+        return "The month must consist of 2 digits and be from 1 to 12.";
     }
 }

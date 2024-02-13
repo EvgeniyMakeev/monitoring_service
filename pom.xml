@@ -33,8 +33,7 @@
         <postgresql.version>42.7.1</postgresql.version>
         <liquibase.version>4.25.1</liquibase.version>
         <testcontainers.version>1.19.4</testcontainers.version>
-        <jakarta.servlet.version>6.0.0</jakarta.servlet.version>
-        <lombok.version>1.18.30</lombok.version>
+        <jakarta.servlet.version>6.1.0-M1</jakarta.servlet.version>
         <jackson.version>2.15.3</jackson.version>
         <aspectj.version>1.9.20.1</aspectj.version>
         <plugin.war.version>3.3.1</plugin.war.version>
@@ -106,12 +105,6 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${jakarta.servlet.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

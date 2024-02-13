@@ -27,7 +27,7 @@ import java.util.List;
 public class IndicationsServlet extends HttpServlet {
     private ObjectMapper objectMapper;
     private IndicationService indicationService;
-    private IndicationsOfUserMapper indicationsOfUserMapper;
+    private final IndicationsOfUserMapper indicationsOfUserMapper = IndicationsOfUserMapper.INSTANCE;
     private CounterDAO counterDAO;
     private Input input;
 
@@ -36,7 +36,6 @@ public class IndicationsServlet extends HttpServlet {
         super.init();
         objectMapper = new ObjectMapper();
         indicationService = new IndicationService(new ConnectionManagerImpl());
-        indicationsOfUserMapper = indicationsOfUserMapper.INSTANCE;
         counterDAO = new CounterDAO(new ConnectionManagerImpl());
         input = new Input();
     }
@@ -83,12 +82,15 @@ public class IndicationsServlet extends HttpServlet {
             int month = input.getMonth(monthStr);
             Double value = input.getDouble(valueStr);
             LocalDate date = LocalDate.of(year, month,1);
-            Counter counter = counterDAO.getCounterByName(counterName).orElseThrow();
+            Counter counter = counterDAO.getCounterByName(counterName).orElseThrow(NoCounterNameException::new);
 
             indicationService.addIndicationOfUser(login, counter, date, value);
 
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.getWriter().write("Indication added successfully");
+        } catch (NoCounterNameException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(e.getMessage());
         } catch (IncorrectValuesException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write(e.getMessage());

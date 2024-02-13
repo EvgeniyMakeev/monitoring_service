@@ -1,13 +1,9 @@
-package com.makeev.monitoring_service.servlets.users_servlets;
+package com.makeev.monitoring_service.servlets.admin_servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.UserDAO;
-import com.makeev.monitoring_service.dto.UserDTO;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.UserNotFoundException;
-import com.makeev.monitoring_service.mappers.UserMapper;
-import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,19 +12,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Loggable
-@WebServlet("/users/getUser")
-public class GetUserByLoginServlet extends HttpServlet {
-    private ObjectMapper objectMapper;
+@WebServlet("/admin")
+public class AdminServlet extends HttpServlet {
+
     private UserDAO userDAO;
-    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        objectMapper = new ObjectMapper();
         userDAO = new UserDAO(new ConnectionManagerImpl());
     }
 
@@ -36,17 +29,19 @@ public class GetUserByLoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String login = req.getParameter("login");
-            if (login == null || login.isEmpty()) {
+            if (login == null) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write("Login parameter is required");
                 return;
             }
-
-            Optional<User> user = userDAO.getUserByLogin(login);
-            UserDTO userDTO = userMapper.toDTO(user.orElseThrow(UserNotFoundException::new));
             resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getOutputStream(), userDTO);
+            if (!userDAO.isAdmin(login)) {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.getWriter().write("You do not have administrator rights.");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.sendRedirect(req.getContextPath() + "/admin/logs");
+            }
         } catch (UserNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
