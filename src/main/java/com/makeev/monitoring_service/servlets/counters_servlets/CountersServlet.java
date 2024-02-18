@@ -22,6 +22,7 @@ import java.util.List;
 @Loggable
 @WebServlet("/counters")
 public class CountersServlet extends HttpServlet {
+    public static final String CONTENT_TYPE = "application/json";
     private ObjectMapper objectMapper;
     private CounterDAO counterDAO;
     private final CounterMapper counterMapper = CounterMapper.INSTANCE;
@@ -42,7 +43,7 @@ public class CountersServlet extends HttpServlet {
                     .map(counterMapper::toDTO)
                     .toList();
 
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), counterDTOs);
         } catch (EmptyException e) {
@@ -58,14 +59,14 @@ public class CountersServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             String nameOfCounter = req.getParameter("nameOfCounter");
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             if (nameOfCounter == null || nameOfCounter.isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write("Name of counter is required");
                 return;
             }
             counterDAO.addCounter(nameOfCounter);
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.getWriter().write(nameOfCounter + " counter added successfully");
         } catch (CounterAlreadyExistsException e) {

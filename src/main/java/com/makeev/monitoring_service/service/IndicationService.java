@@ -28,10 +28,12 @@ public class IndicationService {
 
     private final ConnectionManager connectionManager;
     private final CounterDAO counterDAO;
+    private final UserDAO userDAO;
 
     public IndicationService(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
         this.counterDAO = new CounterDAO(connectionManager);
+        this.userDAO = new UserDAO(connectionManager);
     }
 
     private final static String ADD_INDICATION_SQL ="""
@@ -65,6 +67,7 @@ public class IndicationService {
             throws IncorrectValuesException {
         try (var connection = connectionManager.open();
              var statementAdd = connection.prepareStatement(ADD_INDICATION_SQL)) {
+            userDAO.getUserByLogin(login);
             List<IndicationsOfUser> listOfIndicationsOfUser = new ArrayList<>();
             try {
                 listOfIndicationsOfUser = getCurrentIndication(login);
@@ -119,7 +122,7 @@ public class IndicationService {
                 Indication indication = new Indication(date, value);
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                counterDAO.getCounterById(user_id).orElseThrow(),
+                                counterDAO.getCounterById(user_id),
                                 indication));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -145,7 +148,7 @@ public class IndicationService {
                 Double value = result.getDouble("value");
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                counterDAO.getCounterById(user_id).orElseThrow(),
+                                counterDAO.getCounterById(user_id),
                                 new Indication(date, value)));
             }
             if (listOfIndicationsOfUser.isEmpty()) {
@@ -178,7 +181,7 @@ public class IndicationService {
                 Double value = result.getDouble("value");
                 listOfIndicationsOfUser.add(
                         new IndicationsOfUser(login,
-                                counterDAO.getCounterById(user_id).orElseThrow(),
+                                counterDAO.getCounterById(user_id),
                                 new Indication(date, value)));
             }
             if (listOfIndicationsOfUser.isEmpty()) {

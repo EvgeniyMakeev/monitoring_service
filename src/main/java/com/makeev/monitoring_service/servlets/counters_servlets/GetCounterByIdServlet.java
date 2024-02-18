@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
-import com.makeev.monitoring_service.exceptions.NoCounterIdException;
+import com.makeev.monitoring_service.exceptions.CounterIdException;
 import com.makeev.monitoring_service.mappers.CounterMapper;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManagerImpl;
@@ -15,12 +15,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Loggable
 @WebServlet("/counters/getCounter")
 public class GetCounterByIdServlet extends HttpServlet {
 
+    public static final String CONTENT_TYPE = "application/json";
     private ObjectMapper objectMapper;
     private CounterDAO counterDAO;
     private final CounterMapper counterMapper = CounterMapper.INSTANCE;
@@ -43,21 +43,16 @@ public class GetCounterByIdServlet extends HttpServlet {
             }
 
             long id = Long.parseLong(idString);
-            Optional<Counter> counter = counterDAO.getCounterById(id);
+            Counter counter = counterDAO.getCounterById(id);
 
-            if (counter.isEmpty()) {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().write("Counter with this ID not found");
-                return;
-            }
 
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getOutputStream(), counterMapper.toDTO(counter.get()));
+            objectMapper.writeValue(resp.getOutputStream(), counterMapper.toDTO(counter));
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Invalid ID format");
-        } catch (NoCounterIdException e) {
+        } catch (CounterIdException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write(e.getMessage());
         } catch (DaoException e) {

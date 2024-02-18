@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
  */
 public class Input {
 
-    private final Pattern PATTERN_ONLY_DOUBLE = Pattern.compile("^\\d+(\\.\\d+)?$");
-    private final Pattern PATTERN_ONLY_YEAR = Pattern.compile("\\d{4}");
-    private final Pattern PATTERN_ONLY_MONTH = Pattern.compile("\\d{2}");
+    private final static Pattern PATTERN_ONLY_DOUBLE = Pattern.compile("^\\d+(\\.\\d+)?$");
+    private final static Pattern PATTERN_ONLY_YEAR = Pattern.compile("\\d{4}");
+    private final static Pattern PATTERN_ONLY_MONTH = Pattern.compile("\\d{2}");
 
     /**
      * Reads and returns a double input from the user.
@@ -34,7 +34,9 @@ public class Input {
             throw new YearFormatException();
         }
         int result = Integer.parseInt(inputString);
-        if (result < 2000 || result > 2100) {
+        int minYear = 2000;
+        int maxYear = 2100;
+        if (result < minYear || result > maxYear) {
             throw new YearFormatException();
         } else {
             return result;

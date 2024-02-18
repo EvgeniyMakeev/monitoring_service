@@ -22,6 +22,7 @@ import java.util.List;
 
 @WebServlet("/indications/indicationsForUser")
 public class GetAllIndicationsForUserServlet extends HttpServlet {
+    public static final String CONTENT_TYPE = "application/json";
 
     private ObjectMapper objectMapper;
     private IndicationService indicationService;
@@ -56,7 +57,7 @@ public class GetAllIndicationsForUserServlet extends HttpServlet {
                         .map(indicationsOfUserMapper::toDTO)
                         .toList();
 
-                resp.setContentType("application/json");
+                resp.setContentType(CONTENT_TYPE);
                 resp.setStatus(HttpServletResponse.SC_OK);
                 objectMapper.writeValue(resp.getOutputStream(), indicationsOfUserDTOs);
             } catch (EmptyException e) {

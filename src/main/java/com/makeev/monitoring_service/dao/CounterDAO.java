@@ -4,12 +4,11 @@ import com.makeev.monitoring_service.aop.annotations.Loggable;
 import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
-import com.makeev.monitoring_service.exceptions.NoCounterIdException;
+import com.makeev.monitoring_service.exceptions.CounterIdException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManager;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +35,7 @@ public class CounterDAO {
     public void addCounter(String nameOfCounter) throws CounterAlreadyExistsException {
         try (var connection = connectionManager.open();
              var statementCheck = connection.prepareStatement(CHECK_NAME_OF_COUNTER_SQL);
-             var statementAdd = connection.prepareStatement(ADD_SQL, Statement.RETURN_GENERATED_KEYS)) {
+             var statementAdd = connection.prepareStatement(ADD_SQL)) {
             statementCheck.setString(1, nameOfCounter);
             var result = statementCheck.executeQuery();
             if (result.next()) {
@@ -44,11 +43,6 @@ public class CounterDAO {
             }
             statementAdd.setString(1, nameOfCounter);
             statementAdd.executeUpdate();
-            var key = statementAdd.getGeneratedKeys();
-            Long id = -1L;
-            if (key.next()){
-                id = key.getLong("id");
-            }
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -60,7 +54,7 @@ public class CounterDAO {
      * @param id The id of the Counter to retrieve.
      * @return An {@code Optional} containing the Counter if found, or empty if not found.
      */
-    public Optional<Counter> getCounterById(Long id) {
+    public Counter getCounterById(Long id) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_ID_SQL)) {
             statement.setLong(1, id);
@@ -70,19 +64,20 @@ public class CounterDAO {
                 counter = Optional.of(new Counter(id, result.getString("name")));
             }
             if (counter.isEmpty()) {
-                throw new NoCounterIdException();
+                throw new CounterIdException();
             } else {
-                return counter;
+                return counter.orElseThrow(CounterIdException::new);
             }
         } catch (SQLException e) {
             throw new DaoException(e);
         }
     }
-    public Optional<Counter> getCounterByName(String name) {
+    public Counter getCounterByName(String name) {
         return getAllCounters()
                 .stream()
                 .filter(c -> c.name().equalsIgnoreCase(name))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(CounterIdException::new);
     }
 
     /**

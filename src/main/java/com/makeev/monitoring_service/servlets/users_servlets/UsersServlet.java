@@ -23,6 +23,7 @@ import java.util.List;
 @Loggable
 @WebServlet("/users")
 public class UsersServlet extends HttpServlet {
+    public static final String CONTENT_TYPE = "application/json";
 
     private ObjectMapper objectMapper;
     private UserDAO userDAO;
@@ -44,7 +45,7 @@ public class UsersServlet extends HttpServlet {
                     .map(userMapper::toDTO)
                     .toList();
 
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), userDTOs);
         } catch (EmptyException e) {
@@ -61,7 +62,7 @@ public class UsersServlet extends HttpServlet {
         try {
             String login = req.getParameter("login");
             String password = req.getParameter("password");
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             if (login == null || login.isEmpty() || password == null || password.isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write("Both login and password parameters are required");

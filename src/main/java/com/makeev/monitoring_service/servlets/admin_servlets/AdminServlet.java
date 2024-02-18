@@ -17,6 +17,11 @@ import java.io.IOException;
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
 
+    public static final String CONTENT_TYPE = "application/json";
+    public static final String LOGIN_IS_REQUIRED = "Login parameter is required";
+    public static final String NO_RIGHTS = "You do not have administrator rights.";
+
+
     private UserDAO userDAO;
 
     @Override
@@ -31,13 +36,13 @@ public class AdminServlet extends HttpServlet {
             String login = req.getParameter("login");
             if (login == null) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Login parameter is required");
+                resp.getWriter().write(LOGIN_IS_REQUIRED);
                 return;
             }
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             if (!userDAO.isAdmin(login)) {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                resp.getWriter().write("You do not have administrator rights.");
+                resp.getWriter().write(NO_RIGHTS);
             } else {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.sendRedirect(req.getContextPath() + "/admin/logs");

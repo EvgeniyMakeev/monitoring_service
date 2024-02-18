@@ -52,7 +52,7 @@ public class UserDAO{
      * @param login The login of the User to retrieve.
      * @return An {@code Optional} containing the User if found, or empty if not found.
      */
-    public Optional<User> getUserByLogin(String login) {
+    public User getUserByLogin(String login) {
         try (var connection = connectionManager.open();
              var statement = connection.prepareStatement(GET_BY_LOGIN_SQL)) {
             statement.setString(1, login);
@@ -63,11 +63,7 @@ public class UserDAO{
                         result.getString("password"),
                         result.getBoolean("admin")));
             }
-            if (user.isEmpty()) {
-                throw new UserNotFoundException();
-            } else {
-                return user;
-            }
+            return user.orElseThrow(UserNotFoundException::new);
         } catch (SQLException e) {
             throw new UserNotFoundException();
         }

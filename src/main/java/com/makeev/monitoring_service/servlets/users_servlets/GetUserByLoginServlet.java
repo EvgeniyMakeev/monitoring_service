@@ -16,11 +16,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Loggable
 @WebServlet("/users/getUser")
 public class GetUserByLoginServlet extends HttpServlet {
+    public static final String CONTENT_TYPE = "application/json";
+
     private ObjectMapper objectMapper;
     private UserDAO userDAO;
     private final UserMapper userMapper = UserMapper.INSTANCE;
@@ -42,9 +43,9 @@ public class GetUserByLoginServlet extends HttpServlet {
                 return;
             }
 
-            Optional<User> user = userDAO.getUserByLogin(login);
-            UserDTO userDTO = userMapper.toDTO(user.orElseThrow(UserNotFoundException::new));
-            resp.setContentType("application/json");
+            User user = userDAO.getUserByLogin(login);
+            UserDTO userDTO = userMapper.toDTO(user);
+            resp.setContentType(CONTENT_TYPE);
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), userDTO);
         } catch (UserNotFoundException e) {

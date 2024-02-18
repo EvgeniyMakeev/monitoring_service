@@ -23,6 +23,8 @@ import java.util.List;
 @WebServlet("/indications/indicationsForUserForMonth")
 public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
 
+    public static final String CONTENT_TYPE = "application/json";
+
     private ObjectMapper objectMapper;
     private IndicationService indicationService;
     private final IndicationsOfUserMapper indicationsOfUserMapper = IndicationsOfUserMapper.INSTANCE;
@@ -70,7 +72,7 @@ public class GetAllIndicationsForUserForMonthServlet extends HttpServlet {
                         .map(indicationsOfUserMapper::toDTO)
                         .toList();
 
-                resp.setContentType("application/json");
+                resp.setContentType(CONTENT_TYPE);
                 resp.setStatus(HttpServletResponse.SC_OK);
                 objectMapper.writeValue(resp.getOutputStream(), indicationsOfUserDTOs);
             } catch (YearFormatException e) {

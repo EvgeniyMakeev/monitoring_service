@@ -21,6 +21,8 @@ import java.util.List;
 @WebServlet("/admin/logs")
 public class LoggerServlet extends HttpServlet {
 
+    public static final String CONTENT_TYPE = "application/json";
+
     private ObjectMapper objectMapper;
     private AdminService adminService;
     private final UserEventMapper userEventMapper = UserEventMapper.INSTANCE;
@@ -41,7 +43,7 @@ public class LoggerServlet extends HttpServlet {
                     .map(userEventMapper::toDTO)
                     .toList();
 
-            resp.setContentType("application/json");
+            resp.setContentType(CONTENT_TYPE);
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getOutputStream(), userEventDTOs);
         } catch (DaoException e) {
