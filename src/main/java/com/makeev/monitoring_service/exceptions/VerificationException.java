@@ -5,7 +5,7 @@ package com.makeev.monitoring_service.exceptions;
  * typically due to incorrect login credentials. It extends the {@code Exception} class and provides a
  * custom error message.
  */
-public class VerificationException extends Exception {
+public class VerificationException extends RuntimeException {
 
     /**
      * Overrides the {@code getMessage} method to provide a custom error message for the verification exception.
@@ -14,8 +14,9 @@ public class VerificationException extends Exception {
      */
     @Override
     public String getMessage() {
-        return "Access is denied!\n"
-                + "Wrong login or password.";
+        return """
+                Access is denied!
+                Wrong login or password.""";
     }
 }
 

@@ -1,0 +1,18 @@
+version: '3.9'
+
+volumes:
+  pg_monitoring:
+
+services:
+  pg_monitoring:
+    container_name: my_postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=user
+      - POSTGRES_DB=monitoring_db
+    volumes:
+      - pg_monitoring:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT:-15432}:5432

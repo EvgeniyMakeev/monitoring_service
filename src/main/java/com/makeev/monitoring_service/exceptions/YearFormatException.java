@@ -4,7 +4,7 @@ package com.makeev.monitoring_service.exceptions;
  * The {@code EmptyException} class is an exception that is thrown when there are no indications found.
  * It extends the {@code Exception} class and provides a custom error message.
  */
-public class EmptyException extends RuntimeException {
+public class YearFormatException extends RuntimeException {
 
     /**
      * Overrides the {@code getMessage} method to provide a custom error message for the exception.
@@ -13,6 +13,6 @@ public class EmptyException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return "There are no indications.";
+        return "The year must have 4 digits and be between 2000 and 2100.";
     }
 }
