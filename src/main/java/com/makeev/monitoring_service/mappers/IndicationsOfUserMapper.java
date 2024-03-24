@@ -4,12 +4,9 @@ import com.makeev.monitoring_service.dto.IndicationsOfUserDTO;
 import com.makeev.monitoring_service.model.IndicationsOfUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface IndicationsOfUserMapper {
-    IndicationsOfUserMapper INSTANCE = Mappers.getMapper(IndicationsOfUserMapper.class);
-
     @Mapping(target = "login", source = "indicationsOfUser.login")
     @Mapping(target = "nameOfCounter", source = "indicationsOfUser.counter.name")
     @Mapping(target = "year", source = "indicationsOfUser.indication.date.year")

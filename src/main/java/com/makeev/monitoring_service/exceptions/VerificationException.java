@@ -14,9 +14,7 @@ public class VerificationException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return """
-                Access is denied!
-                Wrong login or password.""";
+        return "Access is denied! Wrong login or password.";
     }
 }
 

@@ -2,6 +2,7 @@ package com.makeev.monitoring_service.in;
 
 import com.makeev.monitoring_service.exceptions.MonthFormatException;
 import com.makeev.monitoring_service.exceptions.YearFormatException;
+import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
@@ -10,6 +11,8 @@ import java.util.regex.Pattern;
  * @author Evgeniy Makeev
  * @version 1.4
  */
+
+@Service
 public class Input {
 
     private final static Pattern PATTERN_ONLY_DOUBLE = Pattern.compile("^\\d+(\\.\\d+)?$");

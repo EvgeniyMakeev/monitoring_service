@@ -1,13 +1,12 @@
 package com.makeev.monitoring_service.dao;
 
-import com.makeev.monitoring_service.aop.annotations.Loggable;
-import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.LoginAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.UserNotFoundException;
 import com.makeev.monitoring_service.exceptions.VerificationException;
 import com.makeev.monitoring_service.model.User;
 import com.makeev.monitoring_service.utils.ConnectionManager;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,8 +18,7 @@ import java.util.Optional;
  * It provides methods to retrieve, add, and query User information, as well as handle
  * user-related operations such as login verification and indication submission.
  */
-@Loggable
-@LoggableToDB
+@Service
 public class UserDAO{
 
     private final ConnectionManager connectionManager;

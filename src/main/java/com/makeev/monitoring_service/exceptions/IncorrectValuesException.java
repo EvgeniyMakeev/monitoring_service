@@ -14,10 +14,8 @@ public class IncorrectValuesException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return """
-                Meter readings have not been sent.
-                Testimony can be submitted only once a month
-                and it cannot be less than the current one.
-                """;
+        return "Meter readings have not been sent." +
+                "Testimony can be submitted only once" +
+                "a month and it cannot be less than the current one.";
     }
 }

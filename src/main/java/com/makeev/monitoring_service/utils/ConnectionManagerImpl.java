@@ -1,11 +1,14 @@
 package com.makeev.monitoring_service.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@Component
 public class ConnectionManagerImpl implements ConnectionManager {
 
     private String url;

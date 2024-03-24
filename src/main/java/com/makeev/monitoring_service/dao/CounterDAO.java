@@ -1,12 +1,11 @@
 package com.makeev.monitoring_service.dao;
 
-import com.makeev.monitoring_service.aop.annotations.Loggable;
-import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.exceptions.CounterAlreadyExistsException;
 import com.makeev.monitoring_service.exceptions.DaoException;
 import com.makeev.monitoring_service.exceptions.CounterIdException;
 import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.utils.ConnectionManager;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,8 +16,7 @@ import java.util.Optional;
  * The {@code CounterDAO} class is responsible for managing the persistence
  * of Counter entities. It provides methods to retrieve, add, and query Counters.
  */
-@Loggable
-@LoggableToDB
+@Service
 public class CounterDAO {
 
     private final ConnectionManager connectionManager;

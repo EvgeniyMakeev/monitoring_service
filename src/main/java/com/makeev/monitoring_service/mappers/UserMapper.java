@@ -4,11 +4,9 @@ import com.makeev.monitoring_service.dto.UserDTO;
 import com.makeev.monitoring_service.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(target = "login", source = "user.login")
     UserDTO toDTO(User user);

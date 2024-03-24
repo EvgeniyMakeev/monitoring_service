@@ -1,7 +1,5 @@
 package com.makeev.monitoring_service.service;
 
-import com.makeev.monitoring_service.aop.annotations.Loggable;
-import com.makeev.monitoring_service.aop.annotations.LoggableToDB;
 import com.makeev.monitoring_service.dao.CounterDAO;
 import com.makeev.monitoring_service.dao.UserDAO;
 import com.makeev.monitoring_service.exceptions.DaoException;
@@ -11,6 +9,8 @@ import com.makeev.monitoring_service.model.Counter;
 import com.makeev.monitoring_service.model.Indication;
 import com.makeev.monitoring_service.model.IndicationsOfUser;
 import com.makeev.monitoring_service.utils.ConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -22,14 +22,14 @@ import java.util.List;
  * It interacts with the {@link UserDAO} and {@link CounterDAO} to perform operations such as adding users,
  * retrieving indications, and handling exceptions.
  */
-@Loggable
-@LoggableToDB
+@Service
 public class IndicationService {
 
     private final ConnectionManager connectionManager;
     private final CounterDAO counterDAO;
     private final UserDAO userDAO;
 
+    @Autowired
     public IndicationService(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
         this.counterDAO = new CounterDAO(connectionManager);
