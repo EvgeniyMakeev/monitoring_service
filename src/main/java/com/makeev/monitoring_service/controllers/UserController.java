@@ -8,17 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
     private final UserMapper userMapper;
@@ -30,7 +24,7 @@ public class UserController {
         this.userDAO = userDAO;
     }
 
-    @GetMapping
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userDAO.getAllUsers();
         List<UserDTO> userDTOs = users.stream()
@@ -39,9 +33,8 @@ public class UserController {
         return ResponseEntity.ok(userDTOs);
     }
 
-    @GetMapping(value = "/getUser", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserByLogin(
-            @RequestParam(value = "login", required = false) String login) {
+    @GetMapping(value = "/user/{login}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUserByLogin(@PathVariable("login") String login) {
         if (login == null || login.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Login parameter is required");
@@ -51,7 +44,7 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
-    @PostMapping
+    @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addUser(
             @RequestParam(value = "login", required = false) String login,
             @RequestParam(value = "password", required = false) String password) {
@@ -64,7 +57,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body("New user added successfully");
     }
 
-    @PutMapping
+    @PutMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> logIn(
             @RequestParam(value = "login", required = false) String login,
             @RequestParam(value = "password", required = false) String password) {
