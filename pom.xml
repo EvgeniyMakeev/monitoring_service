@@ -30,7 +30,7 @@
         <mockito-junit-jupiter.version>4.8.1</mockito-junit-jupiter.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
-        <postgresql.version>42.7.1</postgresql.version>
+        <postgresql.version>42.7.2</postgresql.version>
         <liquibase.version>4.25.1</liquibase.version>
         <testcontainers.version>1.19.4</testcontainers.version>
         <jakarta.servlet.version>6.1.0-M1</jakarta.servlet.version>
